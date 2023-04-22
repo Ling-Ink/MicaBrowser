@@ -8,14 +8,16 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityMainBinding;
+import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Global;
+import com.moling.micabrowser.utils.History;
 import com.moling.micabrowser.utils.Search;
+
+import java.io.File;
 
 public class MainActivity extends Activity {
 
@@ -31,11 +33,14 @@ public class MainActivity extends Activity {
 
         // 获取SharedPreferences对象
         Global.sharedPreferences = getSharedPreferences("mica_browser_settings",MODE_PRIVATE);
+        // 获取本地数据对象
+        Global.history = new History(new File(
+                        getFilesDir().getAbsolutePath() + File.separator + "mica_browser_history.json"
+                ));
 
         // 控件绑定
         mButtonMenu = binding.buttonMenu;
         mEditSearch = binding.editSearch;
-        //mLayoutMenu = binding.layoutMenu;
 
         // BottomSheet 初始化
         BottomSheetDialog dialog = new BottomSheetDialog(this);
@@ -56,6 +61,20 @@ public class MainActivity extends Activity {
                 startActivity(browserIntent);
             }
             return false;
+        });
+
+        // 历史菜单
+        dialog.findViewById(R.id.menu_history).setOnClickListener(view -> {
+            Intent menuIntent = new Intent(this, MenuActivity.class);
+            menuIntent.setData(Uri.parse(Constants.MENU_TYPE_HISTORY));
+            startActivity(menuIntent);
+        });
+
+        // 书签菜单
+        dialog.findViewById(R.id.menu_bookmark).setOnClickListener(view -> {
+            Intent menuIntent = new Intent(this, MenuActivity.class);
+            menuIntent.setData(Uri.parse(Constants.MENU_TYPE_BOOKMARK));
+            startActivity(menuIntent);
         });
     }
 }

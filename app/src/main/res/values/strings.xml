@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">MicaBrowser</string>
+    <string name="menu_history">历史</string>
+    <string name="menu_bookmark">书签</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.

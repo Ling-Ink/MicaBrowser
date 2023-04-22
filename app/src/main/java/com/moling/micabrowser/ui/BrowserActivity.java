@@ -2,17 +2,13 @@ package com.moling.micabrowser.ui;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
+import com.moling.micabrowser.utils.History;
 
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkNavigationHistory;
@@ -38,8 +34,13 @@ public class BrowserActivity extends XWalkActivity {
         // XWalkView 事件监听
         mXWalkView.setResourceClient(new XWalkResourceClient(this.mXWalkView) {
             @Override
-            public void onProgressChanged(XWalkView xWalkView, int i) {
-                Log.d("Progress", String.valueOf(i));
+            public void onProgressChanged(XWalkView view, int i) {
+                Log.d("[Progress]", String.valueOf(i));
+            }
+            @Override
+            public void onLoadFinished(XWalkView view, String url) {
+                History.append(mXWalkView.getTitle(), mXWalkView.getUrl());
+                Log.d("[LoadFinished]", mXWalkView.getTitle() + " | " + mXWalkView.getUrl());
             }
         });
         // 加载 Url
@@ -72,6 +73,11 @@ public class BrowserActivity extends XWalkActivity {
             } else {
                 Toast.makeText(this,"已是最前", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        // 刷新按钮事件
+        dialog.findViewById(R.id.button_refresh).setOnClickListener(view -> {
+            mXWalkView.reload(0);
         });
 
         // 前进按钮事件
