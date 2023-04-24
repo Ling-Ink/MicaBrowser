@@ -7,9 +7,9 @@
     android:layout_height="match_parent">
 
     <FrameLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             <org.xwalk.core.XWalkView
                 android:id="@+id/xwalkview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
         </LinearLayout>
 
         <Button
@@ -29,6 +29,20 @@
             android:background="#00000000"
             android:text="_"
             android:textColor="#FFFFFF" />
+
+        <com.moling.micabrowser.views.CircularProgressView
+            android:id="@+id/progress_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="-5dp"
+            android:layout_marginTop="-5dp"
+            android:layout_marginRight="-5dp"
+            android:layout_marginBottom="-5dp"
+            app:backColor="#00000000"
+            app:backWidth="20dp"
+            app:progColor="#75F1FF"
+            app:progWidth="5dp"
+            app:progress="65" />
 
     </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

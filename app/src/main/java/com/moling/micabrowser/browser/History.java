@@ -28,7 +28,7 @@ public class History {
         } else {
             HistoryJsonArr = JSON.parseArray(HistoryJsonStr);
         }
-        for (int i = 0; i < HistoryJsonArr.size(); i++) {
+        for (int i = HistoryJsonArr.size() - 1; i >= 0 ; i--) {
             history.add(new HistoryModel(
                     HistoryJsonArr.getJSONObject(i).getString("url"),
                     HistoryJsonArr.getJSONObject(i).getString("title")

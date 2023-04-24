@@ -9,6 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
 import com.moling.micabrowser.browser.History;
+import com.moling.micabrowser.views.CircularProgressView;
 
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkNavigationHistory;
@@ -20,6 +21,7 @@ public class BrowserActivity extends XWalkActivity {
     private ActivityBrowserBinding binding;
     private Button mButtonMenu;
     private XWalkView mXWalkView;
+    private CircularProgressView mProgressLoading;
 
     @Override
     protected void onXWalkReady() {
@@ -36,11 +38,13 @@ public class BrowserActivity extends XWalkActivity {
             @Override
             public void onProgressChanged(XWalkView view, int i) {
                 Log.d("[Progress]", String.valueOf(i));
+                mProgressLoading.setProgress(i);
             }
             @Override
             public void onLoadFinished(XWalkView view, String url) {
                 History.put(mXWalkView.getTitle(), mXWalkView.getUrl());
                 Log.d("[LoadFinished]", mXWalkView.getTitle() + " | " + mXWalkView.getUrl());
+                mProgressLoading.setProgress(0);
             }
         });
         // 加载 Url
@@ -56,6 +60,7 @@ public class BrowserActivity extends XWalkActivity {
         // 控件绑定
         mXWalkView = binding.xwalkview;
         mButtonMenu = binding.buttonMenu;
+        mProgressLoading = binding.progressLoading;
 
         // BottomSheet 初始化
         BottomSheetDialog dialog = new BottomSheetDialog(this);
