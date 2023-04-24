@@ -8,7 +8,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
-import com.moling.micabrowser.utils.History;
+import com.moling.micabrowser.browser.History;
 
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkNavigationHistory;
@@ -39,7 +39,7 @@ public class BrowserActivity extends XWalkActivity {
             }
             @Override
             public void onLoadFinished(XWalkView view, String url) {
-                History.append(mXWalkView.getTitle(), mXWalkView.getUrl());
+                History.put(mXWalkView.getTitle(), mXWalkView.getUrl());
                 Log.d("[LoadFinished]", mXWalkView.getTitle() + " | " + mXWalkView.getUrl());
             }
         });

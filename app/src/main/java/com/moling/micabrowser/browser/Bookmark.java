@@ -1,4 +1,4 @@
-package com.moling.micabrowser.utils;
+package com.moling.micabrowser.browser;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

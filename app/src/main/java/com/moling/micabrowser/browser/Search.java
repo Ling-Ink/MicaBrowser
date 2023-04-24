@@ -1,6 +1,9 @@
-package com.moling.micabrowser.utils;
+package com.moling.micabrowser.browser;
 
 import android.util.Log;
+
+import com.moling.micabrowser.utils.Config;
+import com.moling.micabrowser.utils.Global;
 
 import java.net.URI;
 import java.net.URISyntaxException;

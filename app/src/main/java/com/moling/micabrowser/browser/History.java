@@ -1,11 +1,15 @@
-package com.moling.micabrowser.utils;
+package com.moling.micabrowser.browser;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.moling.micabrowser.models.HistoryModel;
+import com.moling.micabrowser.utils.Stream;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -15,8 +19,8 @@ public class History {
         this.file = file;
     }
 
-    public static Map<String, String> get() {
-        Map<String, String> history = new HashMap<>();
+    public static List<HistoryModel> get() {
+        List<HistoryModel> history = new ArrayList<>();
         String HistoryJsonStr = Stream.Read(file);
         JSONArray HistoryJsonArr;
         if (HistoryJsonStr.equals("")) {
@@ -25,12 +29,15 @@ public class History {
             HistoryJsonArr = JSON.parseArray(HistoryJsonStr);
         }
         for (int i = 0; i < HistoryJsonArr.size(); i++) {
-            history.put(HistoryJsonArr.getJSONObject(i).getString("title"), HistoryJsonArr.getJSONObject(i).getString("url"));
+            history.add(new HistoryModel(
+                    HistoryJsonArr.getJSONObject(i).getString("url"),
+                    HistoryJsonArr.getJSONObject(i).getString("title")
+            ));
         }
         return history;
     }
 
-    public static void append(String title, String url) {
+    public static void put(String title, String url) {
         String HistoryJsonStr = Stream.Read(file);
         JSONArray HistoryJsonArr;
         if (HistoryJsonStr.equals("")) {

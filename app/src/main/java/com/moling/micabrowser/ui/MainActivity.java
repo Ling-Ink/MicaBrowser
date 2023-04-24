@@ -1,21 +1,26 @@
 package com.moling.micabrowser.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityMainBinding;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Global;
-import com.moling.micabrowser.utils.History;
-import com.moling.micabrowser.utils.Search;
+import com.moling.micabrowser.browser.History;
+import com.moling.micabrowser.browser.Search;
 
 import java.io.File;
 
@@ -24,7 +29,9 @@ public class MainActivity extends Activity {
     private ActivityMainBinding binding;
     private Button mButtonMenu;
     private EditText mEditSearch;
+    public static Handler search;
 
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,14 +61,24 @@ public class MainActivity extends Activity {
         // 搜索框回车事件
         mEditSearch.setOnKeyListener((view, KeyCode, keyEvent) -> {
             if (KeyCode == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN && !mEditSearch.getText().toString().equals("")) {
-                String url = Search.search(mEditSearch.getText().toString());
-                Log.d("[MainActivity]","Search - " + url);
-                Intent browserIntent = new Intent(this, BrowserActivity.class);
-                browserIntent.setData(Uri.parse(url));
-                startActivity(browserIntent);
+                Message searchMsg = new Message();
+                searchMsg.obj = mEditSearch.getText().toString();
+                search.sendMessage(searchMsg);
             }
             return false;
         });
+
+        // 搜索 Handler
+        search = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                String url = Search.search((String) msg.obj);
+                Log.d("[MainActivity]","Search - " + url);
+                Intent browserIntent = new Intent(MainActivity.this, BrowserActivity.class);
+                browserIntent.setData(Uri.parse(url));
+                startActivity(browserIntent);
+            }
+        };
 
         // 历史菜单
         dialog.findViewById(R.id.menu_history).setOnClickListener(view -> {
