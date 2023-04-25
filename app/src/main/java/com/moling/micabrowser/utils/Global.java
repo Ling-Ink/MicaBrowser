@@ -9,4 +9,5 @@ public class Global {
     public static SharedPreferences sharedPreferences;
     public static History history;
     public static Bookmark bookmark;
+    public static String[] suffixList;
 }

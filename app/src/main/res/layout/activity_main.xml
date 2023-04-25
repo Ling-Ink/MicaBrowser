@@ -33,7 +33,8 @@
                 <EditText
                     android:id="@+id/edit_search"
                     android:layout_width="160dp"
-                    android:layout_height="48dp" />
+                    android:layout_height="48dp"
+                    android:text="cn.bing.com"/>
 
                 <ImageView
                     android:layout_width="40dp"

@@ -37,18 +37,24 @@ public class BrowserActivity extends XWalkActivity {
         mXWalkView.setResourceClient(new XWalkResourceClient(this.mXWalkView) {
             @Override
             public void onProgressChanged(XWalkView view, int i) {
-                Log.d("[Progress]", String.valueOf(i));
+                Log.d("[Mica]", "<Progress> | " + i);
                 mProgressLoading.setProgress(i);
             }
             @Override
-            public void onLoadFinished(XWalkView view, String url) {
+            public void onLoadStarted(XWalkView view, String url) {
                 History.put(mXWalkView.getTitle(), mXWalkView.getUrl());
-                Log.d("[LoadFinished]", mXWalkView.getTitle() + " | " + mXWalkView.getUrl());
+                Log.d("[Mica]", "<LoadStarted> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
+            }
+            @Override
+            public void onLoadFinished(XWalkView view, String url) {
+                Log.d("[Mica]", "<LoadFinished> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
                 mProgressLoading.setProgress(0);
             }
         });
         // 加载 Url
-        mXWalkView.loadUrl(getIntent().getDataString());
+        String url = getIntent().getData().toString();
+        Log.d("[Mica]", "<BrowserActivity> | LoadURL - " + url);
+        mXWalkView.loadUrl(url);
     }
 
     @Override

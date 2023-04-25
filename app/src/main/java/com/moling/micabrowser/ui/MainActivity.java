@@ -23,6 +23,8 @@ import com.moling.micabrowser.browser.History;
 import com.moling.micabrowser.browser.Search;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class MainActivity extends Activity {
 
@@ -38,6 +40,15 @@ public class MainActivity extends Activity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // 从 assets 中读取域名后缀列表
+        try (InputStream input = getAssets().open("tlds-alpha-by-domain.txt")) {
+            int n;
+            StringBuilder sb = new StringBuilder();
+            while ((n = input.read()) != -1) {
+                sb.append((char) n);
+            }
+            Global.suffixList = sb.toString().split("\r\n");
+        } catch (IOException e) {}
         // 获取SharedPreferences对象
         Global.sharedPreferences = getSharedPreferences("mica_browser_settings",MODE_PRIVATE);
         // 获取本地数据对象
@@ -73,7 +84,7 @@ public class MainActivity extends Activity {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 String url = Search.search((String) msg.obj);
-                Log.d("[MainActivity]","Search - " + url);
+                Log.d("[Mica]","<MainActivity> | Search - " + url);
                 Intent browserIntent = new Intent(MainActivity.this, BrowserActivity.class);
                 browserIntent.setData(Uri.parse(url));
                 startActivity(browserIntent);
