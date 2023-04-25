@@ -1,4 +1,4 @@
-package com.moling.micabrowser.adapters;
+package com.moling.micabrowser.widgets.URL;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,14 +7,13 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.moling.micabrowser.R;
-import com.moling.micabrowser.models.HistoryModel;
 
 import java.util.List;
 
-public class HistoryAdapter extends BaseAdapter {
-    private List<HistoryModel> mData;
+public class URLAdapter extends BaseAdapter {
+    private List<URLModel> mData;
     private LayoutInflater mInflater;
-    public HistoryAdapter(LayoutInflater inflater, List<HistoryModel> data) {
+    public URLAdapter(LayoutInflater inflater, List<URLModel> data) {
         this.mInflater = inflater;
         this.mData = data;
     }
@@ -36,9 +35,9 @@ public class HistoryAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View viewHistory = mInflater.inflate(R.layout.widget_history, null);
+        View viewHistory = mInflater.inflate(R.layout.widget_url, null);
         // 获取 history 对象
-        HistoryModel history = mData.get(position);
+        URLModel history = mData.get(position);
         // 获得自定义布局中每一个控件的对象
         TextView text_title = (TextView) viewHistory.findViewById(R.id.text_title);
         TextView text_url = (TextView) viewHistory.findViewById(R.id.text_url);

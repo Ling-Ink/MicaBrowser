@@ -19,7 +19,7 @@ import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityMainBinding;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Global;
-import com.moling.micabrowser.browser.History;
+import com.moling.micabrowser.widgets.URL.URLWidget;
 import com.moling.micabrowser.browser.Search;
 
 import java.io.File;
@@ -52,9 +52,12 @@ public class MainActivity extends Activity {
         // 获取SharedPreferences对象
         Global.sharedPreferences = getSharedPreferences("mica_browser_settings",MODE_PRIVATE);
         // 获取本地数据对象
-        Global.history = new History(new File(
-                        getFilesDir().getAbsolutePath() + File.separator + "mica_browser_history.json"
-                ));
+        Global.history = new URLWidget(new File(
+                getFilesDir().getAbsolutePath() + File.separator + "mica_browser_history.json"
+        ));
+        Global.bookmark = new URLWidget(new File(
+                getFilesDir().getAbsolutePath() + File.separator + "mica_browser_bookmarks.json"
+        ));
 
         // 控件绑定
         mButtonMenu = binding.buttonMenu;

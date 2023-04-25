@@ -1,9 +1,9 @@
-package com.moling.micabrowser.models;
+package com.moling.micabrowser.widgets.URL;
 
-public class HistoryModel {
+public class URLModel {
     private String title;
     private String url;
-    public HistoryModel(String url, String title) {
+    public URLModel(String url, String title) {
         this.url = url;
         this.title = title;
     }

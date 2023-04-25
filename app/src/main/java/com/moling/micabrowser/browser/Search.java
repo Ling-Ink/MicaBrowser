@@ -20,7 +20,7 @@ public class Search {
     public static String search(String address) {
         Log.d("[Mica]", "<search> | Searching address:[" + address + "]");
         try {
-            // 判断是否存在以定义的 http/https 协议
+            // 判断是否存在已定义的 http/https 协议
             String[] urlArray = address.split("://");
             Log.d("[Mica]", "<search> | Url had scheme:[" + urlArray[0] + "], with:[" + urlArray[1] + "]");
         } catch (Exception e) {

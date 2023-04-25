@@ -50,9 +50,18 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
+                    android:layout_marginRight="7dp"
                     android:background="#00000000"
                     android:foreground="@drawable/arrow_refresh" />
+
+                <Button
+                    android:id="@+id/button_bookmark"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="7dp"
+                    android:layout_marginRight="15dp"
+                    android:background="#00000000"
+                    android:foreground="@drawable/bookmark" />
 
                 <Button
                     android:id="@+id/button_forward"

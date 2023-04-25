@@ -1,5 +1,6 @@
 package com.moling.micabrowser.ui;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -8,14 +9,18 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
-import com.moling.micabrowser.browser.History;
+import com.moling.micabrowser.utils.Global;
 import com.moling.micabrowser.views.CircularProgressView;
+import com.moling.micabrowser.widgets.URL.URLModel;
 
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkNavigationHistory;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkSettings;
 import org.xwalk.core.XWalkView;
+
+import java.util.List;
+import java.util.Objects;
 
 public class BrowserActivity extends XWalkActivity {
     private ActivityBrowserBinding binding;
@@ -42,7 +47,7 @@ public class BrowserActivity extends XWalkActivity {
             }
             @Override
             public void onLoadStarted(XWalkView view, String url) {
-                History.put(mXWalkView.getTitle(), mXWalkView.getUrl());
+                Global.history.put(mXWalkView.getTitle(), mXWalkView.getUrl());
                 Log.d("[Mica]", "<LoadStarted> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
             }
             @Override
@@ -74,6 +79,16 @@ public class BrowserActivity extends XWalkActivity {
 
         // BottomSheet 按钮
         mButtonMenu.setOnClickListener(view -> {
+            // 判断书签是否存在
+            List<URLModel> bookmarksList = Global.bookmark.get();
+            for (int i = 0; i < bookmarksList.size(); i++) {
+                if (Objects.equals(mXWalkView.getUrl(), bookmarksList.get(i).getUrl())) {
+                    dialog.findViewById(R.id.button_bookmark).setForeground(getResources().getDrawable(R.drawable.bookmark_starred));
+                    break;
+                } else {
+                    dialog.findViewById(R.id.button_bookmark).setForeground(getResources().getDrawable(R.drawable.bookmark));
+                }
+            }
             dialog.show();
         });
 
@@ -89,6 +104,22 @@ public class BrowserActivity extends XWalkActivity {
         // 刷新按钮事件
         dialog.findViewById(R.id.button_refresh).setOnClickListener(view -> {
             mXWalkView.reload(0);
+        });
+
+        // 书签按钮事件
+        dialog.findViewById(R.id.button_bookmark).setOnClickListener(view -> {
+            List<URLModel> bookmarksList = Global.bookmark.get();
+            // 书签已存在
+            for (int i = 0; i < bookmarksList.size(); i++) {
+                if (Objects.equals(mXWalkView.getUrl(), bookmarksList.get(i).getUrl())) {
+                    Global.bookmark.delete(bookmarksList.size() - 1 - i);
+                    dialog.findViewById(R.id.button_bookmark).setForeground(getResources().getDrawable(R.drawable.bookmark));
+                    return;
+                }
+            }
+            // 书签不存在
+            Global.bookmark.put(mXWalkView.getTitle(), mXWalkView.getUrl());
+            dialog.findViewById(R.id.button_bookmark).setForeground(getResources().getDrawable(R.drawable.bookmark_starred));
         });
 
         // 前进按钮事件

@@ -15,6 +15,9 @@
             android:id="@+id/text_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lines="1"
+            android:minEms="30"
             android:text="title" />
 
         <TextView
