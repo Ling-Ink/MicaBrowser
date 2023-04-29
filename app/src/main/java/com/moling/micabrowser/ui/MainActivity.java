@@ -29,7 +29,8 @@ import java.io.InputStream;
 public class MainActivity extends Activity {
 
     private ActivityMainBinding binding;
-    private Button mButtonMenu;
+    private Button mButtonHistory;
+    private Button mButtonBookmark;
     private EditText mEditSearch;
     public static Handler search;
 
@@ -60,17 +61,9 @@ public class MainActivity extends Activity {
         ));
 
         // 控件绑定
-        mButtonMenu = binding.buttonMenu;
         mEditSearch = binding.editSearch;
-
-        // BottomSheet 初始化
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
-        dialog.setContentView(R.layout.dialog_menu_main);
-
-        // BottomSheet 按钮
-        mButtonMenu.setOnClickListener(view -> {
-            dialog.show();
-        });
+        mButtonHistory = binding.menuHistory;
+        mButtonBookmark = binding.menuBookmark;
 
         // 搜索框回车事件
         mEditSearch.setOnKeyListener((view, KeyCode, keyEvent) -> {
@@ -95,14 +88,14 @@ public class MainActivity extends Activity {
         };
 
         // 历史菜单
-        dialog.findViewById(R.id.menu_history).setOnClickListener(view -> {
+        mButtonHistory.setOnClickListener(view -> {
             Intent menuIntent = new Intent(this, MenuActivity.class);
             menuIntent.setData(Uri.parse(Constants.MENU_TYPE_HISTORY));
             startActivity(menuIntent);
         });
 
         // 书签菜单
-        dialog.findViewById(R.id.menu_bookmark).setOnClickListener(view -> {
+        mButtonBookmark.setOnClickListener(view -> {
             Intent menuIntent = new Intent(this, MenuActivity.class);
             menuIntent.setData(Uri.parse(Constants.MENU_TYPE_BOOKMARK));
             startActivity(menuIntent);

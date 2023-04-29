@@ -39,7 +39,7 @@ public class Menu_Listener {
     public static AdapterView.OnItemLongClickListener BookmarkLongClickListener(LayoutInflater inflater) {
         AdapterView.OnItemLongClickListener listener = (parent, view, position, id) -> {
             Log.d("[Mica]", "<BookmarkLongClickListener> | Bookmark item long clicked:[" + position + "]");
-            Menu_Listener_Utils.RemoveUrlByPosition(Global.history, inflater, position);
+            Menu_Listener_Utils.RemoveUrlByPosition(Global.bookmark, inflater, position);
             return true;
         };
         return listener;
@@ -57,7 +57,7 @@ class Menu_Listener_Utils {
     protected static void RemoveUrlByPosition(URLWidget urlObj, LayoutInflater inflater, int position) {
         urlObj.delete(position);
         Message adapterMsg = new Message();
-        adapterMsg.obj = new URLAdapter(inflater, Menu_Adapter.HistoryAdapter());;
+        adapterMsg.obj = new URLAdapter(inflater, urlObj.get());
         MenuActivity.setAdapter.sendMessage(adapterMsg);
     }
 }

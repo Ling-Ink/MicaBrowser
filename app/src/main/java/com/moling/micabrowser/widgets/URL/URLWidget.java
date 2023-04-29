@@ -48,6 +48,9 @@ public class URLWidget {
         if (HistoryJsonArr.size() > 0) {
             if (!Objects.equals(url, HistoryJsonArr.getJSONObject(HistoryJsonArr.size() - 1).getString("url"))) {
                 HistoryJsonArr.add(History);
+            } else if (!Objects.equals(title, HistoryJsonArr.getJSONObject(HistoryJsonArr.size() - 1).getString("title"))) {
+                HistoryJsonArr.remove(HistoryJsonArr.size() - 1);
+                HistoryJsonArr.add(History);
             }
         } else {
             HistoryJsonArr.add(History);

@@ -14,9 +14,11 @@ import com.moling.micabrowser.views.CircularProgressView;
 import com.moling.micabrowser.widgets.URL.URLModel;
 
 import org.xwalk.core.XWalkActivity;
+import org.xwalk.core.XWalkDownloadListener;
 import org.xwalk.core.XWalkNavigationHistory;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkSettings;
+import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
 
 import java.util.List;
@@ -54,6 +56,12 @@ public class BrowserActivity extends XWalkActivity {
             public void onLoadFinished(XWalkView view, String url) {
                 Log.d("[Mica]", "<LoadFinished> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
                 mProgressLoading.setProgress(0);
+            }
+        });
+        mXWalkView.setDownloadListener(new XWalkDownloadListener(getApplicationContext()) {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
             }
         });
         // 加载 Url
