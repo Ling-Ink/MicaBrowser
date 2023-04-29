@@ -2,6 +2,8 @@ package com.moling.micabrowser.ui;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -9,6 +11,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
+import com.moling.micabrowser.utils.Download;
 import com.moling.micabrowser.utils.Global;
 import com.moling.micabrowser.views.CircularProgressView;
 import com.moling.micabrowser.widgets.URL.URLModel;
@@ -61,7 +64,15 @@ public class BrowserActivity extends XWalkActivity {
         mXWalkView.setDownloadListener(new XWalkDownloadListener(getApplicationContext()) {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                String[] urlArray = url.split("/");
                 Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
+                new Thread(() -> {
+                    if (!Download.fromUrl(url, urlArray[urlArray.length - 1], Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.mainActivity,urlArray[urlArray.length - 1] + "\n下载完成", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                }).start();
             }
         });
         // 加载 Url

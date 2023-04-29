@@ -1,5 +1,6 @@
 package com.moling.micabrowser.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
@@ -33,6 +35,7 @@ public class MainActivity extends Activity {
     private Button mButtonBookmark;
     private EditText mEditSearch;
     public static Handler search;
+    public static MainActivity mainActivity;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -60,10 +63,17 @@ public class MainActivity extends Activity {
                 getFilesDir().getAbsolutePath() + File.separator + "mica_browser_bookmarks.json"
         ));
 
+        mainActivity = this;
+
         // 控件绑定
         mEditSearch = binding.editSearch;
         mButtonHistory = binding.menuHistory;
         mButtonBookmark = binding.menuBookmark;
+
+        // 权限请求
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 222);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 222);
 
         // 搜索框回车事件
         mEditSearch.setOnKeyListener((view, KeyCode, keyEvent) -> {
