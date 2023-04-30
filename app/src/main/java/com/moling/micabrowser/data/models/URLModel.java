@@ -1,4 +1,4 @@
-package com.moling.micabrowser.widgets.URL;
+package com.moling.micabrowser.data.models;
 
 public class URLModel {
     private String title;

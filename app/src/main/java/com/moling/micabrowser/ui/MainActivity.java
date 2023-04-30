@@ -16,15 +16,12 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityMainBinding;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Global;
-import com.moling.micabrowser.widgets.URL.URLWidget;
+import com.moling.micabrowser.data.Data;
 import com.moling.micabrowser.browser.Search;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -33,6 +30,7 @@ public class MainActivity extends Activity {
     private ActivityMainBinding binding;
     private Button mButtonHistory;
     private Button mButtonBookmark;
+    private Button mButtonDownload;
     private EditText mEditSearch;
     public static Handler search;
 
@@ -56,17 +54,13 @@ public class MainActivity extends Activity {
         // 获取SharedPreferences对象
         Global.sharedPreferences = getSharedPreferences("mica_browser_settings",MODE_PRIVATE);
         // 获取本地数据对象
-        Global.history = new URLWidget(new File(
-                getFilesDir().getAbsolutePath() + File.separator + "mica_browser_history.json"
-        ));
-        Global.bookmark = new URLWidget(new File(
-                getFilesDir().getAbsolutePath() + File.separator + "mica_browser_bookmarks.json"
-        ));
+        Global.data = new Data(getFilesDir().getAbsolutePath());
 
         // 控件绑定
         mEditSearch = binding.editSearch;
         mButtonHistory = binding.menuHistory;
         mButtonBookmark = binding.menuBookmark;
+        mButtonDownload = binding.menuDownload;
 
         // 权限请求
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
@@ -109,6 +103,13 @@ public class MainActivity extends Activity {
         mButtonBookmark.setOnClickListener(view -> {
             Intent menuIntent = new Intent(this, MenuActivity.class);
             menuIntent.setData(Uri.parse(Constants.MENU_TYPE_BOOKMARK));
+            startActivity(menuIntent);
+        });
+
+        // 下载菜单
+        mButtonDownload.setOnClickListener(view -> {
+            Intent menuIntent = new Intent(this, MenuActivity.class);
+            menuIntent.setData(Uri.parse(Constants.MENU_TYPE_DOWNLOAD));
             startActivity(menuIntent);
         });
     }

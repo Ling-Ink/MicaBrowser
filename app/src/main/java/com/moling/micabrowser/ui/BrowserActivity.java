@@ -24,7 +24,7 @@ import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Download;
 import com.moling.micabrowser.utils.Global;
 import com.moling.micabrowser.views.CircularProgressView;
-import com.moling.micabrowser.widgets.URL.URLModel;
+import com.moling.micabrowser.data.models.URLModel;
 
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkDownloadListener;
@@ -33,6 +33,7 @@ import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkSettings;
 import org.xwalk.core.XWalkView;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,10 +45,6 @@ public class BrowserActivity extends XWalkActivity {
     private ImageView mImageMenu;
     private XWalkView mXWalkView;
     private CircularProgressView mProgressLoading;
-    // XWalkView 移动相关
-    private int MoveType;
-    private int StartMoveX;
-    private int StartMoveY;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -69,11 +66,13 @@ public class BrowserActivity extends XWalkActivity {
             }
             @Override
             public void onLoadStarted(XWalkView view, String url) {
-                Global.history.put(mXWalkView.getTitle(), mXWalkView.getUrl());
+                //Global.history.put(mXWalkView.getTitle(), mXWalkView.getUrl());
+                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
                 Log.d("[Mica]", "<LoadStarted> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
             }
             @Override
             public void onLoadFinished(XWalkView view, String url) {
+                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
                 Log.d("[Mica]", "<LoadFinished> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
                 mProgressLoading.setProgress(0);
                 // 初始化 URL 文本框
@@ -87,6 +86,9 @@ public class BrowserActivity extends XWalkActivity {
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
                 String[] urlArray = url.split("/");
                 Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
+                // 写下载项目
+                Global.data.putDownload(urlArray[urlArray.length - 1], Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
+                // 下载 Thread
                 new Thread(() -> {
                     if (!Download.fromUrl(url, urlArray[urlArray.length - 1], Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
                         Looper.prepare();
@@ -121,7 +123,7 @@ public class BrowserActivity extends XWalkActivity {
         // BottomSheet 按钮
         mImageMenu.setOnClickListener(view -> {
             // 初始化书签按钮
-            List<URLModel> bookmarksList = Global.bookmark.get();
+            List<URLModel> bookmarksList = Global.data.getBookMark();
             for (int i = 0; i < bookmarksList.size(); i++) {
                 if (Objects.equals(mXWalkView.getUrl(), bookmarksList.get(i).getUrl())) {
                     ((ImageButton) dialog.findViewById(R.id.button_bookmark)).setImageResource(R.drawable.bookmark_starred);
@@ -150,17 +152,17 @@ public class BrowserActivity extends XWalkActivity {
 
         // 书签按钮事件
         dialog.findViewById(R.id.button_bookmark).setOnClickListener(view -> {
-            List<URLModel> bookmarksList = Global.bookmark.get();
+            List<URLModel> bookmarksList = Global.data.getBookMark();
             // 书签已存在
             for (int i = 0; i < bookmarksList.size(); i++) {
                 if (Objects.equals(mXWalkView.getUrl(), bookmarksList.get(i).getUrl())) {
-                    Global.bookmark.delete(bookmarksList.size() - 1 - i);
+                    Global.data.delBookMark(bookmarksList.size() - 1 - i);
                     ((ImageButton) dialog.findViewById(R.id.button_bookmark)).setImageResource(R.drawable.bookmark);
                     return;
                 }
             }
             // 书签不存在
-            Global.bookmark.put(mXWalkView.getTitle(), mXWalkView.getUrl());
+            Global.data.putBookMark(mXWalkView.getTitle(), mXWalkView.getUrl());
             ((ImageButton) dialog.findViewById(R.id.button_bookmark)).setImageResource(R.drawable.bookmark_starred);
         });
 
@@ -210,6 +212,13 @@ public class BrowserActivity extends XWalkActivity {
         dialog.findViewById(R.id.dialog_button_bookmark).setOnClickListener(view -> {
             Intent menuIntent = new Intent(this, MenuActivity.class);
             menuIntent.setData(Uri.parse(Constants.MENU_TYPE_BOOKMARK));
+            startActivity(menuIntent);
+        });
+
+        // 下载按钮事件
+        dialog.findViewById(R.id.dialog_button_download).setOnClickListener(view -> {
+            Intent menuIntent = new Intent(this, MenuActivity.class);
+            menuIntent.setData(Uri.parse(Constants.MENU_TYPE_DOWNLOAD));
             startActivity(menuIntent);
         });
     }

@@ -5,10 +5,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.AdapterView;
 
+import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Global;
-import com.moling.micabrowser.widgets.URL.URLAdapter;
-import com.moling.micabrowser.widgets.URL.URLWidget;
-import com.moling.micabrowser.widgets.URL.URLModel;
+import com.moling.micabrowser.data.adapters.URLAdapter;
+import com.moling.micabrowser.data.models.URLModel;
 import com.moling.micabrowser.ui.MainActivity;
 import com.moling.micabrowser.ui.MenuActivity;
 
@@ -23,7 +23,7 @@ public class Menu_Listener {
     public static AdapterView.OnItemLongClickListener HistoryLongClickListener(LayoutInflater inflater) {
         AdapterView.OnItemLongClickListener listener = (parent, view, position, id) -> {
             Log.d("[Mica]", "<HistoryClickListener> | History item long clicked:[" + position + "]");
-            Menu_Listener_Utils.RemoveUrlByPosition(Global.history, inflater, position);
+            Menu_Listener_Utils.RemoveByPosition(Constants.MENU_TYPE_HISTORY, inflater, position);
             return true;
         };
         return listener;
@@ -39,7 +39,16 @@ public class Menu_Listener {
     public static AdapterView.OnItemLongClickListener BookmarkLongClickListener(LayoutInflater inflater) {
         AdapterView.OnItemLongClickListener listener = (parent, view, position, id) -> {
             Log.d("[Mica]", "<BookmarkLongClickListener> | Bookmark item long clicked:[" + position + "]");
-            Menu_Listener_Utils.RemoveUrlByPosition(Global.bookmark, inflater, position);
+            Menu_Listener_Utils.RemoveByPosition(Constants.MENU_TYPE_BOOKMARK, inflater, position);
+            return true;
+        };
+        return listener;
+    }
+
+    public static AdapterView.OnItemLongClickListener DownloadLongClickListener(LayoutInflater inflater) {
+        AdapterView.OnItemLongClickListener listener = (parent, view, position, id) -> {
+            Log.d("[Mica]", "<BookmarkLongClickListener> | Bookmark item long clicked:[" + position + "]");
+            Menu_Listener_Utils.RemoveByPosition(Constants.MENU_TYPE_DOWNLOAD, inflater, position);
             return true;
         };
         return listener;
@@ -54,10 +63,27 @@ class Menu_Listener_Utils {
         MainActivity.search.sendMessage(searchMsg);
         MenuActivity.menuActivity.finish();
     }
-    protected static void RemoveUrlByPosition(URLWidget urlObj, LayoutInflater inflater, int position) {
-        urlObj.delete(position);
-        Message adapterMsg = new Message();
-        adapterMsg.obj = new URLAdapter(inflater, urlObj.get());
-        MenuActivity.setAdapter.sendMessage(adapterMsg);
+    protected static void RemoveByPosition(String type, LayoutInflater inflater, int position) {
+        Message adapterMsg;
+        switch (type) {
+            case Constants.MENU_TYPE_HISTORY:
+                Global.data.delHistory(position);
+                adapterMsg = new Message();
+                adapterMsg.obj = new URLAdapter(inflater, Global.data.getHistory());
+                MenuActivity.setURLAdapter.sendMessage(adapterMsg);
+                break;
+            case Constants.MENU_TYPE_BOOKMARK:
+                Global.data.delBookMark(position);
+                adapterMsg = new Message();
+                adapterMsg.obj = new URLAdapter(inflater, Global.data.getBookMark());
+                MenuActivity.setURLAdapter.sendMessage(adapterMsg);
+                break;
+            case Constants.MENU_TYPE_DOWNLOAD:
+                Global.data.delDownload(position);
+                adapterMsg = new Message();
+                adapterMsg.obj = MenuActivity.dumpDownloadsList(Global.data.getDownload());
+                MenuActivity.setDownloadAdapter.sendMessage(adapterMsg);
+                break;
+        }
     }
 }

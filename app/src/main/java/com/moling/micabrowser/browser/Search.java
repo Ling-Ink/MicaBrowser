@@ -69,6 +69,7 @@ public class Search {
             }
         } catch (Exception e) {
             Log.d("[Mica]", "<isUrl> | " + urlString + " is Not Url because url host doesn't have legal suffix");
+            return false;
         }
 
         // 判断协议是否为 http/https

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MicaBrowser</string>
+    <string name="menu_history">History</string>
+    <string name="menu_bookmark">Bookmark</string>
+    <string name="text_searchbox">Search</string>
+    <string name="browser_zoom">Zoom</string>
+    <string name="menu_download">Download</string>
+</resources>

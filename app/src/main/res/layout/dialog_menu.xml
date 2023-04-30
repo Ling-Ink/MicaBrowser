@@ -109,6 +109,14 @@
                     android:text="@string/menu_bookmark"
                     android:textColor="#FFFFFF" />
 
+                <Button
+                    android:id="@+id/dialog_button_download"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/menu_button"
+                    android:text="@string/menu_download"
+                    android:textColor="#FFFFFF" />
+
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
