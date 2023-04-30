@@ -29,13 +29,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class MainActivity extends Activity {
-
+    public static MainActivity mainActivity;
     private ActivityMainBinding binding;
     private Button mButtonHistory;
     private Button mButtonBookmark;
     private EditText mEditSearch;
     public static Handler search;
-    public static MainActivity mainActivity;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -43,6 +42,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        mainActivity = this;
 
         // 从 assets 中读取域名后缀列表
         try (InputStream input = getAssets().open("tlds-alpha-by-domain.txt")) {
@@ -62,8 +62,6 @@ public class MainActivity extends Activity {
         Global.bookmark = new URLWidget(new File(
                 getFilesDir().getAbsolutePath() + File.separator + "mica_browser_bookmarks.json"
         ));
-
-        mainActivity = this;
 
         // 控件绑定
         mEditSearch = binding.editSearch;
@@ -91,6 +89,9 @@ public class MainActivity extends Activity {
             public void handleMessage(@NonNull Message msg) {
                 String url = Search.search((String) msg.obj);
                 Log.d("[Mica]","<MainActivity> | Search - " + url);
+                try {
+                    BrowserActivity.browserActivity.finish();
+                } catch (Exception e) { }
                 Intent browserIntent = new Intent(MainActivity.this, BrowserActivity.class);
                 browserIntent.setData(Uri.parse(url));
                 startActivity(browserIntent);
