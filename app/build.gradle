@@ -12,16 +12,17 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0"
-        //ndk {
-        //    abiFilters  'armeabi', 'armeabi-v7a'
-        //}
+        resConfigs 'en','cn'
     }
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            ndk {
+                abiFilters  'armeabi-v7a'
+            }
         }
     }
     buildFeatures {
