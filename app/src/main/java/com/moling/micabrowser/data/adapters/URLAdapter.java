@@ -1,4 +1,4 @@
-package com.moling.micabrowser.widgets.URL;
+package com.moling.micabrowser.data.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.moling.micabrowser.R;
+import com.moling.micabrowser.data.models.URLModel;
 
 import java.util.List;
 

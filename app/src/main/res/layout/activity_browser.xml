@@ -21,14 +21,12 @@
                 android:layout_height="match_parent" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/button_menu"
+        <ImageView
+            android:id="@+id/image_menu"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="15dp"
             android:layout_gravity="bottom|center"
-            android:background="#00000000"
-            android:text="_"
-            android:textColor="#FFFFFF" />
+            android:src="@drawable/menu_line" />
 
         <com.moling.micabrowser.views.CircularProgressView
             android:id="@+id/progress_loading"
@@ -45,4 +43,5 @@
             app:progress="65" />
 
     </FrameLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
