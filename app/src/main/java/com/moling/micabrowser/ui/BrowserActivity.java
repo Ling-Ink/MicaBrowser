@@ -1,21 +1,26 @@
 package com.moling.micabrowser.ui;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
+import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Download;
 import com.moling.micabrowser.utils.Global;
 import com.moling.micabrowser.views.CircularProgressView;
@@ -33,11 +38,18 @@ import java.util.Objects;
 
 public class BrowserActivity extends XWalkActivity {
     public static BrowserActivity browserActivity;
+    // 页面控件
+    private BottomSheetDialog dialog;
     private ActivityBrowserBinding binding;
     private ImageView mImageMenu;
     private XWalkView mXWalkView;
     private CircularProgressView mProgressLoading;
+    // XWalkView 移动相关
+    private int MoveType;
+    private int StartMoveX;
+    private int StartMoveY;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onXWalkReady() {
         XWalkSettings settings = mXWalkView.getSettings();
@@ -64,6 +76,10 @@ public class BrowserActivity extends XWalkActivity {
             public void onLoadFinished(XWalkView view, String url) {
                 Log.d("[Mica]", "<LoadFinished> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
                 mProgressLoading.setProgress(0);
+                // 初始化 URL 文本框
+                ((EditText) dialog.findViewById(R.id.text_url)).setText(mXWalkView.getUrl());
+                // 初始化标题文本框
+                ((TextView) dialog.findViewById(R.id.dialog_text_title)).setText(mXWalkView.getTitle());
             }
         });
         mXWalkView.setDownloadListener(new XWalkDownloadListener(getApplicationContext()) {
@@ -99,7 +115,7 @@ public class BrowserActivity extends XWalkActivity {
         mProgressLoading = binding.progressLoading;
 
         // BottomSheet 初始化
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        dialog = new BottomSheetDialog(this);
         dialog.setContentView(R.layout.dialog_menu);
 
         // BottomSheet 按钮
@@ -114,10 +130,7 @@ public class BrowserActivity extends XWalkActivity {
                     ((ImageButton) dialog.findViewById(R.id.button_bookmark)).setImageResource(R.drawable.bookmark);
                 }
             }
-            // 初始化 URL 文本框
-            ((EditText) dialog.findViewById(R.id.text_url)).setText(mXWalkView.getUrl());
-            // 初始化标题文本框
-            ((TextView) dialog.findViewById(R.id.text_url_title)).setText(mXWalkView.getTitle());
+            dialog.findViewById(R.id.dialog_scrollview).scrollTo(0, 0);
             dialog.show();
         });
 
@@ -142,13 +155,13 @@ public class BrowserActivity extends XWalkActivity {
             for (int i = 0; i < bookmarksList.size(); i++) {
                 if (Objects.equals(mXWalkView.getUrl(), bookmarksList.get(i).getUrl())) {
                     Global.bookmark.delete(bookmarksList.size() - 1 - i);
-                    dialog.findViewById(R.id.button_bookmark).setForeground(getResources().getDrawable(R.drawable.bookmark));
+                    ((ImageButton) dialog.findViewById(R.id.button_bookmark)).setImageResource(R.drawable.bookmark);
                     return;
                 }
             }
             // 书签不存在
             Global.bookmark.put(mXWalkView.getTitle(), mXWalkView.getUrl());
-            dialog.findViewById(R.id.button_bookmark).setForeground(getResources().getDrawable(R.drawable.bookmark_starred));
+            ((ImageButton) dialog.findViewById(R.id.button_bookmark)).setImageResource(R.drawable.bookmark_starred);
         });
 
         // 前进按钮事件
@@ -169,6 +182,35 @@ public class BrowserActivity extends XWalkActivity {
                 MainActivity.search.sendMessage(searchMsg);
             }
             return false;
+        });
+
+        // 页面缩放按钮事件
+        dialog.findViewById(R.id.dialog_button_zoom).setOnClickListener(view -> {
+            int dp35 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,35,getResources().getDisplayMetrics());
+            int dp0 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,0,getResources().getDisplayMetrics());
+            LinearLayout.LayoutParams layout = (LinearLayout.LayoutParams) mXWalkView.getLayoutParams();
+            if (layout.leftMargin == dp0) {
+                layout.leftMargin = dp35; layout.rightMargin = dp35; layout.topMargin = dp35; layout.bottomMargin = dp35;
+                Toast.makeText(this, "页面缩放: 启用", Toast.LENGTH_SHORT).show();
+            } else {
+                layout.leftMargin = dp0; layout.rightMargin = dp0; layout.topMargin = dp0; layout.bottomMargin = dp0;
+                Toast.makeText(this, "页面缩放: 禁用", Toast.LENGTH_SHORT).show();
+            }
+            mXWalkView.setLayoutParams(layout);
+        });
+
+        // 历史记录按钮事件
+        dialog.findViewById(R.id.dialog_button_history).setOnClickListener(view -> {
+            Intent menuIntent = new Intent(this, MenuActivity.class);
+            menuIntent.setData(Uri.parse(Constants.MENU_TYPE_HISTORY));
+            startActivity(menuIntent);
+        });
+
+        // 书签按钮事件
+        dialog.findViewById(R.id.dialog_button_bookmark).setOnClickListener(view -> {
+            Intent menuIntent = new Intent(this, MenuActivity.class);
+            menuIntent.setData(Uri.parse(Constants.MENU_TYPE_BOOKMARK));
+            startActivity(menuIntent);
         });
     }
 }
