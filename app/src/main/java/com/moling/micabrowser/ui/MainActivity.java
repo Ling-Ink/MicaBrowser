@@ -22,6 +22,10 @@ import com.moling.micabrowser.utils.Global;
 import com.moling.micabrowser.data.Data;
 import com.moling.micabrowser.browser.Search;
 
+import com.microsoft.appcenter.AppCenter;
+import com.microsoft.appcenter.analytics.Analytics;
+import com.microsoft.appcenter.crashes.Crashes;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -41,6 +45,11 @@ public class MainActivity extends Activity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         mainActivity = this;
+        // Microsoft AppCenter Analytics
+        Analytics.enableManualSessionTracker();
+        AppCenter.start(getApplication(), "b0ecf30c-9f42-4d12-81ea-8f42a5e20158",
+                Analytics.class, Crashes.class);
+        Analytics.startSession();
 
         // 从 assets 中读取域名后缀列表
         try (InputStream input = getAssets().open("tlds-alpha-by-domain.txt")) {
