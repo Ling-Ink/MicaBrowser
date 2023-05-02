@@ -10,6 +10,8 @@ import android.os.Message;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -45,65 +47,47 @@ public class BrowserActivity extends XWalkActivity {
     private ImageView mImageMenu;
     private XWalkView mXWalkView;
     private CircularProgressView mProgressLoading;
+    private TextView mTextReset;
+    // XWalkView 拖动相关
+    private boolean MoveMode = false;
+    private int StartX;
+    private int StartY;
+    // 当前 XWalkView 位置
+    private int ViewLeft;
+    private int ViewTop;
 
-    @SuppressLint("ClickableViewAccessibility")
+    // 监听 XWalkView 拖动事件
     @Override
-    protected void onXWalkReady() {
-        XWalkSettings settings = mXWalkView.getSettings();
-        // XWalkView 设置
-        settings.setInitialPageScale(100); // 设置缩放比例
-        settings.setJavaScriptEnabled(true); // 启用 JavaScript 支持
-        settings.setJavaScriptCanOpenWindowsAutomatically(true); // 启用 JS 跳转
-        settings.setAllowFileAccess(true);
-        settings.setDomStorageEnabled(true);
-        settings.setAllowContentAccess(true);
-        // XWalkView 事件监听
-        mXWalkView.setResourceClient(new XWalkResourceClient(this.mXWalkView) {
-            @Override
-            public void onProgressChanged(XWalkView view, int i) {
-                Log.d("[Mica]", "<Progress> | " + i);
-                mProgressLoading.setProgress(i);
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            // 存储当前 XWalkView 位置
+            ViewLeft = mXWalkView.getLeft();
+            ViewTop = mXWalkView.getTop();
+            // 存储按下位置
+            StartX = (int) event.getRawX();
+            StartY = (int) event.getRawY();
+            Log.i("[Mica]", "onTouch: 按下X:" + StartX + " Y:" + StartY);
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            Log.i("[Mica]", "onTouch: 抬起");
+        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            if (MoveMode) {
+                // 处理接收到触摸事件并且 MoveDestination 被赋值时的操作
+                int MoveX = (int) event.getRawX() - StartX;
+                int MoveY = (int) event.getRawY() - StartY;
+                Log.i("[Mica]", "onTouch: 移动X:" + MoveX + " Y:" + MoveY);
+                mXWalkView.layout(ViewLeft + MoveX, ViewTop + MoveY, ViewLeft + mXWalkView.getWidth() + MoveX, ViewTop + mXWalkView.getHeight() + MoveY);
+                mTextReset.setVisibility(View.VISIBLE);
+                // 在移动 XWalkView 时禁用右划返回
+                return false;
             }
-            @Override
-            public void onLoadStarted(XWalkView view, String url) {
-                //Global.history.put(mXWalkView.getTitle(), mXWalkView.getUrl());
-                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
-                Log.d("[Mica]", "<LoadStarted> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
-            }
-            @Override
-            public void onLoadFinished(XWalkView view, String url) {
-                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
-                Log.d("[Mica]", "<LoadFinished> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
-                mProgressLoading.setProgress(0);
-                // 初始化 URL 文本框
-                ((EditText) dialog.findViewById(R.id.text_url)).setText(mXWalkView.getUrl());
-                // 初始化标题文本框
-                ((TextView) dialog.findViewById(R.id.dialog_text_title)).setText(mXWalkView.getTitle());
-            }
-        });
-        mXWalkView.setDownloadListener(new XWalkDownloadListener(getApplicationContext()) {
-            @Override
-            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                String[] urlArray = url.split("/");
-                Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
-                // 写下载项目
-                Global.data.putDownload(urlArray[urlArray.length - 1], Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
-                // 下载 Thread
-                new Thread(() -> {
-                    if (!Download.fromUrl(url, urlArray[urlArray.length - 1], Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
-                        Looper.prepare();
-                        Toast.makeText(MainActivity.mainActivity,urlArray[urlArray.length - 1] + "\n下载完成", Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                    }
-                }).start();
-            }
-        });
-        // 加载 Url
-        String url = getIntent().getData().toString();
-        Log.d("[Mica]", "<BrowserActivity> | LoadURL - " + url);
-        mXWalkView.loadUrl(url);
+        }
+        if (getWindow().superDispatchTouchEvent(event)) {
+            return true;
+        }
+        return onTouchEvent(event);
     }
 
+    // onCreate 事件
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +99,7 @@ public class BrowserActivity extends XWalkActivity {
         mXWalkView = binding.xwalkview;
         mImageMenu = binding.imageMenu;
         mProgressLoading = binding.progressLoading;
+        mTextReset = binding.textReset;
 
         // BottomSheet 初始化
         dialog = new BottomSheetDialog(this);
@@ -176,7 +161,7 @@ public class BrowserActivity extends XWalkActivity {
         });
 
         // URL 文本框回车事件
-        EditText urlText = (EditText) dialog.findViewById(R.id.text_url);
+        EditText urlText = dialog.findViewById(R.id.text_url);
         urlText.setOnKeyListener((view, KeyCode, keyEvent) -> {
             if (KeyCode == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN && !urlText.getText().toString().equals("")) {
                 Message searchMsg = new Message();
@@ -186,19 +171,20 @@ public class BrowserActivity extends XWalkActivity {
             return false;
         });
 
-        // 页面缩放按钮事件
+        // 页面移动按钮事件
         dialog.findViewById(R.id.dialog_button_zoom).setOnClickListener(view -> {
-            int dp35 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,35,getResources().getDisplayMetrics());
-            int dp0 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,0,getResources().getDisplayMetrics());
-            LinearLayout.LayoutParams layout = (LinearLayout.LayoutParams) mXWalkView.getLayoutParams();
-            if (layout.leftMargin == dp0) {
-                layout.leftMargin = dp35; layout.rightMargin = dp35; layout.topMargin = dp35; layout.bottomMargin = dp35;
-                Toast.makeText(this, "页面缩放: 启用", Toast.LENGTH_SHORT).show();
+            if (MoveMode) {
+                Toast.makeText(this, "WebView移动: 禁用", Toast.LENGTH_SHORT).show();
             } else {
-                layout.leftMargin = dp0; layout.rightMargin = dp0; layout.topMargin = dp0; layout.bottomMargin = dp0;
-                Toast.makeText(this, "页面缩放: 禁用", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "WebView移动: 启用", Toast.LENGTH_SHORT).show();
             }
-            mXWalkView.setLayoutParams(layout);
+            MoveMode = !MoveMode;
+        });
+
+        // WebView 重置按钮事件
+        mTextReset.setOnClickListener(view -> {
+            mXWalkView.layout(100, 100, mXWalkView.getWidth() + 100, mXWalkView.getHeight() + 100);
+            mTextReset.setVisibility(View.GONE);
         });
 
         // 历史记录按钮事件
@@ -221,5 +207,64 @@ public class BrowserActivity extends XWalkActivity {
             menuIntent.setData(Uri.parse(Constants.MENU_TYPE_DOWNLOAD));
             startActivity(menuIntent);
         });
+    }
+
+    // XWalkView 准备完毕事件
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    protected void onXWalkReady() {
+        XWalkSettings settings = mXWalkView.getSettings();
+        // XWalkView 设置
+        settings.setInitialPageScale(100); // 设置缩放比例
+        settings.setJavaScriptEnabled(true); // 启用 JavaScript 支持
+        settings.setJavaScriptCanOpenWindowsAutomatically(true); // 启用 JS 跳转
+        settings.setAllowFileAccess(true);
+        settings.setDomStorageEnabled(true);
+        settings.setAllowContentAccess(true);
+        // XWalkView 事件监听
+        mXWalkView.setResourceClient(new XWalkResourceClient(this.mXWalkView) {
+            @Override
+            public void onProgressChanged(XWalkView view, int i) {
+                Log.d("[Mica]", "<Progress> | " + i);
+                mProgressLoading.setProgress(i);
+            }
+            @Override
+            public void onLoadStarted(XWalkView view, String url) {
+                //Global.history.put(mXWalkView.getTitle(), mXWalkView.getUrl());
+                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
+                Log.d("[Mica]", "<LoadStarted> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
+            }
+            @Override
+            public void onLoadFinished(XWalkView view, String url) {
+                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
+                Log.d("[Mica]", "<LoadFinished> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
+                mProgressLoading.setProgress(0);
+                // 初始化 URL 文本框
+                ((EditText) dialog.findViewById(R.id.text_url)).setText(mXWalkView.getUrl());
+                // 初始化标题文本框
+                ((TextView) dialog.findViewById(R.id.dialog_text_title)).setText(mXWalkView.getTitle());
+            }
+        });
+        mXWalkView.setDownloadListener(new XWalkDownloadListener(getApplicationContext()) {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                String[] urlArray = url.split("/");
+                Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
+                // 写下载项目
+                Global.data.putDownload(urlArray[urlArray.length - 1], Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
+                // 下载 Thread
+                new Thread(() -> {
+                    if (!Download.fromUrl(url, urlArray[urlArray.length - 1], Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.mainActivity,urlArray[urlArray.length - 1] + "\n下载完成", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                }).start();
+            }
+        });
+        // 加载 Url
+        String url = getIntent().getData().toString();
+        Log.d("[Mica]", "<BrowserActivity> | LoadURL - " + url);
+        mXWalkView.loadUrl(url);
     }
 }
