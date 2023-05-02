@@ -30,13 +30,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class MainActivity extends Activity {
+    @SuppressLint("StaticFieldLeak")
     public static MainActivity mainActivity;
     private ActivityMainBinding binding;
+    // Handlers
+    public static Handler search;
+    public static Handler track;
+    // 窗口控件
     private Button mButtonHistory;
     private Button mButtonBookmark;
     private Button mButtonDownload;
+    private Button mButtonAbout;
     private EditText mEditSearch;
-    public static Handler search;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -70,6 +75,7 @@ public class MainActivity extends Activity {
         mButtonHistory = binding.menuHistory;
         mButtonBookmark = binding.menuBookmark;
         mButtonDownload = binding.menuDownload;
+        mButtonAbout = binding.menuAbout;
 
         // 权限请求
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
@@ -101,6 +107,15 @@ public class MainActivity extends Activity {
             }
         };
 
+        // Microsoft Azure App Center Track Handler
+        track = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                Log.d("[Mica]", "Track Event | " + msg.obj);
+                Analytics.trackEvent((String) msg.obj);
+            }
+        };
+
         // 历史菜单
         mButtonHistory.setOnClickListener(view -> {
             Intent menuIntent = new Intent(this, MenuActivity.class);
@@ -120,6 +135,12 @@ public class MainActivity extends Activity {
             Intent menuIntent = new Intent(this, MenuActivity.class);
             menuIntent.setData(Uri.parse(Constants.MENU_TYPE_DOWNLOAD));
             startActivity(menuIntent);
+        });
+
+        // 关于菜单
+        mButtonAbout.setOnClickListener(view -> {
+            Intent aboutIntent = new Intent(this, AboutActivity.class);
+            startActivity(aboutIntent);
         });
     }
 }

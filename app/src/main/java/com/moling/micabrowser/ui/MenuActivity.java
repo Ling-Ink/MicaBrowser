@@ -5,13 +5,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.moling.micabrowser.R;
 import com.moling.micabrowser.data.adapters.URLAdapter;
 import com.moling.micabrowser.browser.menu.Menu_Adapter;
 import com.moling.micabrowser.browser.menu.Menu_Listener;
@@ -25,14 +26,14 @@ import java.util.List;
 
 public class MenuActivity extends Activity {
     public static MenuActivity menuActivity;
-
     private ActivityMenuBinding binding;
+
+    private TextView mTextMenuTitle;
     private ListView mListMenu;
     private String menuType;
 
     private AdapterView.OnItemClickListener itemClickListener;
     private AdapterView.OnItemLongClickListener itemLongClickListener;
-    private Object adapter;
     public static Handler setURLAdapter;
     public static Handler setDownloadAdapter;
     @SuppressLint("HandlerLeak")
@@ -44,7 +45,9 @@ public class MenuActivity extends Activity {
         menuActivity = this;
 
         // 控件绑定
+        mTextMenuTitle = binding.textMenuTitle;
         mListMenu = binding.listMenu;
+
         // 菜单类型
         menuType = getIntent().getData().toString();
 
@@ -65,9 +68,11 @@ public class MenuActivity extends Activity {
 
         // 设置 Listener 以及 Adapter
         Message adapterMsg = new Message();
+        Object adapter;
         switch (menuType) {
             case Constants.MENU_TYPE_HISTORY:
-                adapter = (Object) new URLAdapter(getLayoutInflater(), Menu_Adapter.HistoryAdapter());
+                mTextMenuTitle.setText(getString(R.string.menu_history));
+                adapter = new URLAdapter(getLayoutInflater(), Menu_Adapter.HistoryAdapter());
                 itemClickListener = Menu_Listener.HistoryClickListener((URLAdapter) adapter);
                 itemLongClickListener = Menu_Listener.HistoryLongClickListener(getLayoutInflater());
 
@@ -75,7 +80,8 @@ public class MenuActivity extends Activity {
                 setURLAdapter.sendMessage(adapterMsg);
                 break;
             case Constants.MENU_TYPE_BOOKMARK:
-                adapter = (Object) new URLAdapter(getLayoutInflater(), Menu_Adapter.BookmarkAdapter());
+                mTextMenuTitle.setText(getString(R.string.menu_bookmark));
+                adapter = new URLAdapter(getLayoutInflater(), Menu_Adapter.BookmarkAdapter());
                 itemClickListener = Menu_Listener.BookmarkClickListener((URLAdapter) adapter);
                 itemLongClickListener = Menu_Listener.BookmarkLongClickListener(getLayoutInflater());
 
@@ -83,7 +89,8 @@ public class MenuActivity extends Activity {
                 setURLAdapter.sendMessage(adapterMsg);
                 break;
             case Constants.MENU_TYPE_DOWNLOAD:
-                adapter = (Object) dumpDownloadsList(Global.data.getDownload());
+                mTextMenuTitle.setText(getString(R.string.menu_download));
+                adapter = dumpDownloadsList(Global.data.getDownload());
                 itemLongClickListener = Menu_Listener.DownloadLongClickListener(getLayoutInflater());
 
                 adapterMsg.obj = adapter;
