@@ -90,7 +90,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/menu_button"
-                    android:text="@string/browser_zoom"
+                    android:text="@string/browser_move"
                     android:textColor="#FFFFFF" />
 
                 <Button
