@@ -34,6 +34,7 @@
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
+        <activity android:name=".ui.AboutActivity" />
         <activity android:name=".ui.BrowserActivity" />
         <activity
             android:name=".ui.MainActivity"
@@ -45,6 +46,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.MenuActivity" />
+        <activity android:name=".ui.NoteActivity" />
     </application>
 
 </manifest>

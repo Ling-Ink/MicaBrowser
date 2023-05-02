@@ -8,14 +8,12 @@ import android.os.Environment;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -230,7 +228,6 @@ public class BrowserActivity extends XWalkActivity {
             }
             @Override
             public void onLoadStarted(XWalkView view, String url) {
-                //Global.history.put(mXWalkView.getTitle(), mXWalkView.getUrl());
                 Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
                 Log.d("[Mica]", "<LoadStarted> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
             }
@@ -243,6 +240,9 @@ public class BrowserActivity extends XWalkActivity {
                 ((EditText) dialog.findViewById(R.id.text_url)).setText(mXWalkView.getUrl());
                 // 初始化标题文本框
                 ((TextView) dialog.findViewById(R.id.dialog_text_title)).setText(mXWalkView.getTitle());
+                Message trackMsg = new Message();
+                trackMsg.obj = "Webpage Load Finished, Browsed Once";
+                MainActivity.track.sendMessage(trackMsg);
             }
         });
         mXWalkView.setDownloadListener(new XWalkDownloadListener(getApplicationContext()) {
