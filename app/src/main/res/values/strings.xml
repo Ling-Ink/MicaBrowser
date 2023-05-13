@@ -5,11 +5,10 @@
     <string name="menu_download">下载</string>
     <string name="menu_about">关于</string>
     <string name="text_searchbox">搜索</string>
-    <string name="browser_move">页面移动</string>
-    <string name="browser_reset">还原页面</string>
     <string name="about_note">更新日志</string>
     <string name="about_github">Github 地址</string>
     <string name="about_project" translatable="false">Mica Project</string>
+    <string name="menu_setting">设置</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.

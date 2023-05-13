@@ -91,6 +91,7 @@ public class MenuActivity extends Activity {
             case Constants.MENU_TYPE_DOWNLOAD:
                 mTextMenuTitle.setText(getString(R.string.menu_download));
                 adapter = dumpDownloadsList(Global.data.getDownload());
+                itemClickListener = Menu_Listener.DownloadClickListener();
                 itemLongClickListener = Menu_Listener.DownloadLongClickListener(getLayoutInflater());
 
                 adapterMsg.obj = adapter;

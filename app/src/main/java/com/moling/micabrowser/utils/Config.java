@@ -7,6 +7,6 @@ public class Config {
         return sharedPreferences.getString("SearchEngine","");
     }
     public static void setSearchEngine(SharedPreferences sharedPreferences, String searchEngine) {
-        sharedPreferences.edit().putString("SearchEngine", searchEngine);
+        sharedPreferences.edit().putString("SearchEngine", searchEngine).apply();
     }
 }

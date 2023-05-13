@@ -40,6 +40,7 @@ public class MainActivity extends Activity {
     private Button mButtonHistory;
     private Button mButtonBookmark;
     private Button mButtonDownload;
+    private Button mButtonSetting;
     private Button mButtonAbout;
     private EditText mEditSearch;
 
@@ -75,6 +76,7 @@ public class MainActivity extends Activity {
         mButtonHistory = binding.menuHistory;
         mButtonBookmark = binding.menuBookmark;
         mButtonDownload = binding.menuDownload;
+        mButtonSetting = binding.menuSetting;
         mButtonAbout = binding.menuAbout;
 
         // 权限请求
@@ -134,6 +136,13 @@ public class MainActivity extends Activity {
         mButtonDownload.setOnClickListener(view -> {
             Intent menuIntent = new Intent(this, MenuActivity.class);
             menuIntent.setData(Uri.parse(Constants.MENU_TYPE_DOWNLOAD));
+            startActivity(menuIntent);
+        });
+
+        // 设置菜单
+        mButtonSetting.setOnClickListener(view -> {
+            Intent menuIntent = new Intent(this, MenuActivity.class);
+            menuIntent.setData(Uri.parse(Constants.MENU_TYPE_SETTING));
             startActivity(menuIntent);
         });
 

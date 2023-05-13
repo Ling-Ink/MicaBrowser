@@ -1,2 +1,12 @@
+Rel-AL 0.3
+    重写:
+     - XWalkView 移动
+Rel-AL 0.2
+    添加:
+     - 关于页面
+     - GPL-3.0 License
+     - 浏览统计
+    重写:
+     - 菜单页面
 Rel-AL 0.1
     第一个 Alpha 版本更新

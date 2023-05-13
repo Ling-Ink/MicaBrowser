@@ -1,5 +1,7 @@
 package com.moling.micabrowser.utils;
 
+import android.util.Log;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -20,7 +22,7 @@ public class Download {
      */
     public static String fromUrl(String urlStr, String fileName, String savePath, String userAgent) {
         try {
-
+            Log.i("[Mica]", "Received Download Request:" + fileName);
             URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             // 设置超时间为3秒
@@ -71,6 +73,24 @@ public class Download {
         }
         bos.close();
         return bos.toByteArray();
+    }
+
+    /**
+     * 对 URL 编码进行解码
+     * @param str
+     * @return
+     */
+    public static String getURLDecoderString(String str) {
+        String result = "";
+        if (null == str) {
+            return "";
+        }
+        try {
+            result = java.net.URLDecoder.decode(str, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

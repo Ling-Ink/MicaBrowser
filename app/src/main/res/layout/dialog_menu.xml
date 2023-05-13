@@ -86,14 +86,6 @@
                     android:textColor="#FFFFFF" />
 
                 <Button
-                    android:id="@+id/dialog_button_zoom"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/menu_button"
-                    android:text="@string/browser_move"
-                    android:textColor="#FFFFFF" />
-
-                <Button
                     android:id="@+id/dialog_button_history"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

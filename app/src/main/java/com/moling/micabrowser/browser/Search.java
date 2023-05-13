@@ -28,6 +28,8 @@ public class Search {
             if (isURL("http://" + address)) {
                 // 添加协议后为合法 URL
                 address = "http://" + address;
+            } else if (isCorrectIp(address)) {
+                address = "http://" + address;
             } else {
                 // 非法 URL, 构建搜索 URL
                 address = buildUrl(address);
@@ -80,6 +82,32 @@ public class Search {
         }
         Log.d("[Mica]", "<isUrl> | " + urlString + " is Not Url because url without http or https");
         return false;
+    }
+
+    //判断字符是否是IP
+    public static boolean isCorrectIp(String ipString) {
+        //1、判断是否是7-15位之间（0.0.0.0-255.255.255.255.255）
+        if (ipString.length()<7||ipString.length()>15) {
+            return false;
+        }
+        //2、判断是否能以小数点分成四段
+        String[] ipArray = ipString.split("\\.");
+        if (ipArray.length != 4) {
+            return false;
+        }
+        for (int i = 0; i < ipArray.length; i++) {
+            //3、判断每段是否都是数字
+            try {
+                int number = Integer.parseInt(ipArray[i]);
+                //4.判断每段数字是否都在0-255之间
+                if (number <0||number>255) {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // 构建搜索 URL
