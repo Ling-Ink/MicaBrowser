@@ -13,13 +13,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.moling.micabrowser.R;
-import com.moling.micabrowser.data.adapters.URLAdapter;
-import com.moling.micabrowser.browser.menu.Menu_Adapter;
-import com.moling.micabrowser.browser.menu.Menu_Listener;
+import com.moling.micabrowser.adapters.SettingAdapter;
+import com.moling.micabrowser.adapters.URLAdapter;
+import com.moling.micabrowser.adapters.MenuAdapter;
+import com.moling.micabrowser.browser.MenuListener;
 import com.moling.micabrowser.data.models.DownloadModel;
 import com.moling.micabrowser.databinding.ActivityMenuBinding;
 import com.moling.micabrowser.utils.Constants;
-import com.moling.micabrowser.utils.Global;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +36,7 @@ public class MenuActivity extends Activity {
     private AdapterView.OnItemLongClickListener itemLongClickListener;
     public static Handler setURLAdapter;
     public static Handler setDownloadAdapter;
+    public static Handler setSettingAdapter;
     @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,10 @@ public class MenuActivity extends Activity {
         binding = ActivityMenuBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         menuActivity = this;
+
+        String[] settingTitle;
+        String[] settingType;
+        String[] settingKey;
 
         // 控件绑定
         mTextMenuTitle = binding.textMenuTitle;
@@ -65,6 +70,13 @@ public class MenuActivity extends Activity {
                 mListMenu.setAdapter((ArrayAdapter<String>) msg.obj);
             }
         };
+        // SettingAdapter Handler
+        setSettingAdapter = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                mListMenu.setAdapter((SettingAdapter) msg.obj);
+            }
+        };
 
         // 设置 Listener 以及 Adapter
         Message adapterMsg = new Message();
@@ -72,30 +84,54 @@ public class MenuActivity extends Activity {
         switch (menuType) {
             case Constants.MENU_TYPE_HISTORY:
                 mTextMenuTitle.setText(getString(R.string.menu_history));
-                adapter = new URLAdapter(getLayoutInflater(), Menu_Adapter.HistoryAdapter());
-                itemClickListener = Menu_Listener.HistoryClickListener((URLAdapter) adapter);
-                itemLongClickListener = Menu_Listener.HistoryLongClickListener(getLayoutInflater());
+                adapter = new URLAdapter(getLayoutInflater(), MenuAdapter.HistoryAdapter());
+                itemClickListener = MenuListener.HistoryClickListener((URLAdapter) adapter);
+                itemLongClickListener = MenuListener.HistoryLongClickListener(getLayoutInflater());
 
                 adapterMsg.obj = adapter;
                 setURLAdapter.sendMessage(adapterMsg);
                 break;
             case Constants.MENU_TYPE_BOOKMARK:
                 mTextMenuTitle.setText(getString(R.string.menu_bookmark));
-                adapter = new URLAdapter(getLayoutInflater(), Menu_Adapter.BookmarkAdapter());
-                itemClickListener = Menu_Listener.BookmarkClickListener((URLAdapter) adapter);
-                itemLongClickListener = Menu_Listener.BookmarkLongClickListener(getLayoutInflater());
+                adapter = new URLAdapter(getLayoutInflater(), MenuAdapter.BookmarkAdapter());
+                itemClickListener = MenuListener.BookmarkClickListener((URLAdapter) adapter);
+                itemLongClickListener = MenuListener.BookmarkLongClickListener(getLayoutInflater());
 
                 adapterMsg.obj = adapter;
                 setURLAdapter.sendMessage(adapterMsg);
                 break;
             case Constants.MENU_TYPE_DOWNLOAD:
                 mTextMenuTitle.setText(getString(R.string.menu_download));
-                adapter = dumpDownloadsList(Global.data.getDownload());
-                itemClickListener = Menu_Listener.DownloadClickListener();
-                itemLongClickListener = Menu_Listener.DownloadLongClickListener(getLayoutInflater());
+                adapter = dumpDownloadsList(MenuAdapter.DownloadAdapter());
+                itemClickListener = MenuListener.DownloadClickListener();
+                itemLongClickListener = MenuListener.DownloadLongClickListener(getLayoutInflater());
 
                 adapterMsg.obj = adapter;
                 setDownloadAdapter.sendMessage(adapterMsg);
+                break;
+            case Constants.MENU_TYPE_SETTING:
+                mTextMenuTitle.setText(R.string.menu_setting);
+                settingTitle = new String[] { "搜索引擎", "App Center 崩溃报告" };
+                settingType = new String[] { Constants.SETTING_TYPE_NEXT, Constants.SETTING_TYPE_SWITCH };
+                settingKey = new String[] { "SearchEngine", "CrashReport" };
+
+                adapter = new SettingAdapter(getLayoutInflater(), settingTitle, settingType, settingKey);
+                itemClickListener = MenuListener.SettingClickListener((SettingAdapter) adapter);
+
+                adapterMsg.obj = adapter;
+                setSettingAdapter.sendMessage(adapterMsg);
+                break;
+            case "SearchEngine":
+                mTextMenuTitle.setText("搜索引擎");
+                settingTitle = new String[] { "必应", "百度", "自定义" };
+                settingType = new String[] { Constants.SETTING_TYPE_SWITCH, Constants.SETTING_TYPE_SWITCH, Constants.SETTING_TYPE_TEXT };
+                settingKey = new String[] { "bing", "baidu", "custom" };
+
+                adapter = new SettingAdapter(getLayoutInflater(), settingTitle, settingType, settingKey);
+                itemClickListener = MenuListener.SettingClickListener((SettingAdapter) adapter);
+
+                adapterMsg.obj = adapter;
+                setSettingAdapter.sendMessage(adapterMsg);
                 break;
         }
         // 设置 listener
