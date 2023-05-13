@@ -48,6 +48,9 @@
                 android:id="@+id/setting_switch"
                 android:layout_width="match_parent"
                 android:layout_height="47dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
                 tools:ignore="UseSwitchCompatOrMaterialXml"
                 tools:visibility="gone" />
 

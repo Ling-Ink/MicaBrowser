@@ -1,12 +1,17 @@
 package com.moling.micabrowser.utils;
 
-import android.content.SharedPreferences;
-
 public class Config {
-    public static String getSearchEngine(SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString("SearchEngine","");
+    public static String getSearchEngine() {
+        return Global.sharedPreferences.getString("SearchEngine","");
     }
-    public static void setSearchEngine(SharedPreferences sharedPreferences, String searchEngine) {
-        sharedPreferences.edit().putString("SearchEngine", searchEngine).apply();
+    public static void setSearchEngine(String searchEngine) {
+        Global.sharedPreferences.edit().putString("SearchEngine", searchEngine).apply();
+    }
+
+    public static boolean getUsageReport() {
+        return Global.sharedPreferences.getBoolean("UsageReport", true);
+    }
+    public static void setUsageReport(boolean UsageReport) {
+        Global.sharedPreferences.edit().putBoolean("UsageReport", UsageReport).apply();
     }
 }

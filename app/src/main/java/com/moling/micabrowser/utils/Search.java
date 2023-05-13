@@ -2,9 +2,6 @@ package com.moling.micabrowser.utils;
 
 import android.util.Log;
 
-import com.moling.micabrowser.utils.Config;
-import com.moling.micabrowser.utils.Global;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -113,7 +110,7 @@ public class Search {
     // 构建搜索 URL
     private static String buildUrl(String address) {
         try {
-            String engineUrl = searchEngine.get(Config.getSearchEngine(Global.sharedPreferences));
+            String engineUrl = searchEngine.get(Config.getSearchEngine());
             address = engineUrl.replace("%search%", address);
         } catch (Exception e) {
             address = "https://cn.bing.com/search?q=%search%".replace("%search%", address);

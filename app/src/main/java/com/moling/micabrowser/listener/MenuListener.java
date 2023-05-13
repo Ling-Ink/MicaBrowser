@@ -3,15 +3,12 @@ package com.moling.micabrowser.listener;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.moling.micabrowser.adapters.SettingAdapter;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Global;
 import com.moling.micabrowser.adapters.URLAdapter;

@@ -13,7 +13,6 @@ import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -23,6 +22,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
+import com.moling.micabrowser.utils.Config;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Download;
 import com.moling.micabrowser.utils.Global;
@@ -307,21 +307,23 @@ public class BrowserActivity extends XWalkActivity {
                 // 初始化标题文本框
                 ((TextView) dialog.findViewById(R.id.dialog_text_title)).setText(mXWalkView.getTitle());
                 // 浏览记录
-                try {
-                    // 获取程序包信息
-                    PackageInfo packageInfo = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0);
-                    // 获取程序信息
-                    ApplicationInfo applicationInfo = getBaseContext().getApplicationInfo();
-                    Message trackMsg = new Message();
-                    // 是否为 Debug 版本
-                    if ((applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
-                        trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " [Debug] }";
-                    } else {
-                        trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " }";
+                if (Config.getUsageReport()) {
+                    try {
+                        // 获取程序包信息
+                        PackageInfo packageInfo = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0);
+                        // 获取程序信息
+                        ApplicationInfo applicationInfo = getBaseContext().getApplicationInfo();
+                        Message trackMsg = new Message();
+                        // 是否为 Debug 版本
+                        if ((applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+                            trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " [Debug] }";
+                        } else {
+                            trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " }";
+                        }
+                        MainActivity.track.sendMessage(trackMsg);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
                     }
-                    MainActivity.track.sendMessage(trackMsg);
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
                 }
             }
         });

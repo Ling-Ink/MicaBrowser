@@ -8,7 +8,6 @@ import android.os.Message;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,16 +16,17 @@ import com.moling.micabrowser.R;
 import com.moling.micabrowser.adapters.SettingAdapter;
 import com.moling.micabrowser.adapters.URLAdapter;
 import com.moling.micabrowser.adapters.MenuAdapter;
+import com.moling.micabrowser.data.Settings;
 import com.moling.micabrowser.listener.MenuListener;
 import com.moling.micabrowser.data.models.DownloadModel;
 import com.moling.micabrowser.databinding.ActivityMenuBinding;
 import com.moling.micabrowser.listener.SettingListener;
 import com.moling.micabrowser.utils.Config;
 import com.moling.micabrowser.utils.Constants;
-import com.moling.micabrowser.utils.Global;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MenuActivity extends Activity {
     public static MenuActivity menuActivity;
@@ -50,8 +50,6 @@ public class MenuActivity extends Activity {
         setContentView(binding.getRoot());
         menuActivity = this;
 
-        String[] settingTitle;
-        String[] settingType;
         String[] settingKey;
         Object[] settingParam;
 
@@ -92,64 +90,65 @@ public class MenuActivity extends Activity {
                 mTextMenuTitle.setText(getString(R.string.menu_history));
 
                 adapter = new URLAdapter(getLayoutInflater(), MenuAdapter.HistoryAdapter());
-                itemClickListener = MenuListener.HistoryClickListener((URLAdapter) adapter);
-                itemLongClickListener = MenuListener.HistoryLongClickListener(getLayoutInflater());
-
                 adapterMsg.obj = adapter;
                 setURLAdapter.sendMessage(adapterMsg);
+
+                itemClickListener = MenuListener.HistoryClickListener((URLAdapter) adapter);
+                itemLongClickListener = MenuListener.HistoryLongClickListener(getLayoutInflater());
                 break;
             case Constants.MENU_TYPE_BOOKMARK:
                 mTextMenuTitle.setText(getString(R.string.menu_bookmark));
 
                 adapter = new URLAdapter(getLayoutInflater(), MenuAdapter.BookmarkAdapter());
-                itemClickListener = MenuListener.BookmarkClickListener((URLAdapter) adapter);
-                itemLongClickListener = MenuListener.BookmarkLongClickListener(getLayoutInflater());
-
                 adapterMsg.obj = adapter;
                 setURLAdapter.sendMessage(adapterMsg);
+
+                itemClickListener = MenuListener.BookmarkClickListener((URLAdapter) adapter);
+                itemLongClickListener = MenuListener.BookmarkLongClickListener(getLayoutInflater());
                 break;
             case Constants.MENU_TYPE_DOWNLOAD:
                 mTextMenuTitle.setText(getString(R.string.menu_download));
 
-                adapter = dumpDownloadsList(MenuAdapter.DownloadAdapter());
+                adapterMsg.obj = dumpDownloadsList(MenuAdapter.DownloadAdapter());
+                setDownloadAdapter.sendMessage(adapterMsg);
+
                 itemClickListener = MenuListener.DownloadClickListener();
                 itemLongClickListener = MenuListener.DownloadLongClickListener(getLayoutInflater());
-
-                adapterMsg.obj = adapter;
-                setDownloadAdapter.sendMessage(adapterMsg);
                 break;
             case Constants.MENU_TYPE_SETTING:
                 mTextMenuTitle.setText(R.string.menu_setting);
 
-                settingTitle = new String[] { "搜索引擎", "App Center 崩溃报告" };
-                settingType = new String[] { Constants.SETTING_TYPE_NEXT, Constants.SETTING_TYPE_SWITCH};
-                settingKey = new String[] { "SearchEngine", "CrashReport" };
-                settingParam = new Object[]{ null, true };
-
-                adapter = new SettingAdapter(getLayoutInflater(), settingTitle, settingType, settingKey, settingParam);
-                itemClickListener = SettingListener.SettingClickListener((SettingAdapter) adapter);
-
+                settingParam = new Object[]{ null, Config.getUsageReport() };
+                adapter = new SettingAdapter(
+                        getLayoutInflater(),
+                        (String[]) Settings.Main().get("title"),
+                        (String[]) Settings.Main().get("type"),
+                        (String[]) Settings.Main().get("key"),
+                        settingParam
+                );
                 adapterMsg.obj = adapter;
                 setSettingAdapter.sendMessage(adapterMsg);
+
+                itemClickListener = SettingListener.SettingClickListener((SettingAdapter) adapter);
                 break;
             case "SearchEngine":
                 mTextMenuTitle.setText("搜索引擎");
 
-                settingTitle = new String[] { "必应", "百度" };
-                settingType = new String[] { Constants.SETTING_TYPE_RADIO, Constants.SETTING_TYPE_RADIO};
-                settingKey = new String[] { "bing", "baidu" };
+                settingKey = (String[]) Settings.SearchEngine().get("key");
                 settingParam = new Object[]{ false, false };
-                for (int i = 0; i < settingKey.length; i++) {
-                    if (settingKey[i].equals(Config.getSearchEngine(Global.sharedPreferences))) {
-                        settingParam[i] = true;
-                    }
+                for (int i = 0; i < Objects.requireNonNull(settingKey).length; i++) {
+                    if (settingKey[i].equals(Config.getSearchEngine())) { settingParam[i] = true; }
                 }
-
-                adapter = new SettingAdapter(getLayoutInflater(), settingTitle, settingType, settingKey, settingParam);
-                itemClickListener = SettingListener.SearchEngineClickListener();
-
-                adapterMsg.obj = adapter;
+                adapterMsg.obj = new SettingAdapter(
+                        getLayoutInflater(),
+                        (String[]) Settings.SearchEngine().get("title"),
+                        (String[]) Settings.SearchEngine().get("type"),
+                        (String[]) Settings.SearchEngine().get("key"),
+                        settingParam
+                );
                 setSettingAdapter.sendMessage(adapterMsg);
+
+                itemClickListener = SettingListener.SearchEngineClickListener();
                 break;
         }
 

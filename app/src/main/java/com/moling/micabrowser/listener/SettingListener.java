@@ -1,23 +1,16 @@
 package com.moling.micabrowser.listener;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.RadioButton;
 
-import com.moling.micabrowser.R;
 import com.moling.micabrowser.adapters.SettingAdapter;
 import com.moling.micabrowser.ui.MainActivity;
 import com.moling.micabrowser.ui.MenuActivity;
 import com.moling.micabrowser.utils.Config;
 import com.moling.micabrowser.utils.Constants;
-import com.moling.micabrowser.utils.Global;
 
 import java.util.Objects;
 
@@ -26,13 +19,28 @@ public class SettingListener {
     public static AdapterView.OnItemClickListener SettingClickListener(SettingAdapter adapter) {
         AdapterView.OnItemClickListener listener = (parent, view, position, id) -> {
             Log.d("[Mica]", "<SettingClickListener> | Setting item clicked");
-            switch (Objects.requireNonNull(adapter.getItem(position).get("type"))) {
-                case Constants.SETTING_TYPE_NEXT:
-                    Intent menuIntent = new Intent(MainActivity.mainActivity, MenuActivity.class);
-                    menuIntent.setData(Uri.parse(adapter.getItem(position).get("key")));
-                    MenuActivity.menuActivity.finish();
-                    MainActivity.mainActivity.startActivity(menuIntent);
-                    break;
+            // 子菜单
+            if (Objects.requireNonNull(adapter.getItem(position).get("type")).equals(Constants.SETTING_TYPE_NEXT)) {
+                Intent menuIntent = new Intent(MainActivity.mainActivity, MenuActivity.class);
+                menuIntent.setData(Uri.parse(adapter.getItem(position).get("key")));
+                MenuActivity.menuActivity.finish();
+                MainActivity.mainActivity.startActivity(menuIntent);
+            } else {
+                // 操作项
+                switch (Objects.requireNonNull(adapter.getItem(position).get("key"))) {
+                    case "UsageReport": // 使用报告
+                        Message adapterMsg = new Message();
+                        String[] settingTitle = new String[] { "搜索引擎", "App Center 使用报告" };
+                        String[] settingType = new String[] { Constants.SETTING_TYPE_NEXT, Constants.SETTING_TYPE_SWITCH};
+                        String[] settingKey = new String[] { "SearchEngine", "UsageReport" };
+                        Object[] settingParam = new Object[]{ null, !Config.getUsageReport() };
+
+                        adapterMsg.obj = new SettingAdapter(MainActivity.mainActivity.getLayoutInflater(), settingTitle, settingType, settingKey, settingParam);
+                        MenuActivity.setSettingAdapter.sendMessage(adapterMsg);
+
+                        Config.setUsageReport(!Config.getUsageReport());
+                        break;
+                }
             }
         };
         return listener;
@@ -52,7 +60,7 @@ public class SettingListener {
             adapterMsg.obj = new SettingAdapter(MainActivity.mainActivity.getLayoutInflater(), settingTitle, settingType, settingKey, settingParam);
             MenuActivity.setSettingAdapter.sendMessage(adapterMsg);
 
-            Config.setSearchEngine(Global.sharedPreferences, settingKey[position]);
+            Config.setSearchEngine(settingKey[position]);
         };
         return listener;
     }
