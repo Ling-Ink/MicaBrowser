@@ -1,4 +1,4 @@
-package com.moling.micabrowser.browser;
+package com.moling.micabrowser.listener;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -19,7 +19,6 @@ import com.moling.micabrowser.data.models.URLModel;
 import com.moling.micabrowser.ui.MainActivity;
 import com.moling.micabrowser.ui.MenuActivity;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class MenuListener {
@@ -73,21 +72,6 @@ public class MenuListener {
             Log.d("[Mica]", "<DownloadLongClickListener> | Download item long clicked:[" + position + "]");
             MenuListenerUtils.RemoveByPosition(Constants.MENU_TYPE_DOWNLOAD, inflater, position);
             return true;
-        };
-        return listener;
-    }
-
-    public static AdapterView.OnItemClickListener SettingClickListener(SettingAdapter adapter){
-        AdapterView.OnItemClickListener listener = (parent, view, position, id) -> {
-            Log.d("[Mica]", "<SettingClickListener> | Setting item clicked");
-            switch (Objects.requireNonNull(adapter.getItem(position).get("type"))) {
-                case Constants.SETTING_TYPE_NEXT:
-                    Intent menuIntent = new Intent(MainActivity.mainActivity, MenuActivity.class);
-                    menuIntent.setData(Uri.parse(adapter.getItem(position).get("key")));
-                    MenuActivity.menuActivity.finish();
-                    MainActivity.mainActivity.startActivity(menuIntent);
-                    break;
-            }
         };
         return listener;
     }

@@ -1,4 +1,4 @@
-package com.moling.micabrowser.browser;
+package com.moling.micabrowser.utils;
 
 import android.util.Log;
 

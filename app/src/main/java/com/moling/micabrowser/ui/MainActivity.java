@@ -20,7 +20,7 @@ import com.moling.micabrowser.databinding.ActivityMainBinding;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Global;
 import com.moling.micabrowser.data.Data;
-import com.moling.micabrowser.browser.Search;
+import com.moling.micabrowser.utils.Search;
 
 import com.microsoft.appcenter.AppCenter;
 import com.microsoft.appcenter.analytics.Analytics;

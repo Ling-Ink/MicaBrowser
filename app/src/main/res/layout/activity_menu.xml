@@ -17,6 +17,7 @@
         android:id="@+id/list_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:choiceMode="singleChoice"
         android:paddingBottom="40dp">
 
     </ListView>
