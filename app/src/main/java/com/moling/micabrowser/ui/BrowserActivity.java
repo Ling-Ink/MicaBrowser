@@ -2,6 +2,9 @@ package com.moling.micabrowser.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -10,7 +13,6 @@ import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
+import com.moling.micabrowser.utils.Config;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Download;
 import com.moling.micabrowser.utils.Global;
@@ -45,42 +48,122 @@ public class BrowserActivity extends XWalkActivity {
     private ImageView mImageMenu;
     private XWalkView mXWalkView;
     private CircularProgressView mProgressLoading;
-    private TextView mTextReset;
     // XWalkView 拖动相关
-    private boolean MoveMode = false;
-    private int StartX;
-    private int StartY;
-    // 当前 XWalkView 位置
+    private final int DEFAULT_VIEW_LOCATION = 100;
+        // 移动方向 5:左上 9:右上 6:左下 10:右下
+    private int MoveDestination = 0;
+        // 响应拖动区域大小
+    private int TouchAreaSize = 120;
+        // 可拖动区域大小
+    private int MoveAreaSize = 120;
+        // 按下时 XWalkView 位置
     private int ViewLeft;
     private int ViewTop;
+        // 按下位置
+    private int StartX;
+    private int StartY;
 
     // 监听 XWalkView 拖动事件
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            // 存储当前 XWalkView 位置
+            // 存储按下时 XWalkView 位置
             ViewLeft = mXWalkView.getLeft();
             ViewTop = mXWalkView.getTop();
             // 存储按下位置
             StartX = (int) event.getRawX();
             StartY = (int) event.getRawY();
-            Log.i("[Mica]", "onTouch: 按下X:" + StartX + " Y:" + StartY);
+            Log.i("[Mica]", "onTouch: 按下X:" + StartX + " Y:" + StartY + " ViewLeft:" + ViewLeft + " ViewTop:" + ViewTop);
+            if (StartY < TouchAreaSize) {
+                MoveDestination = MoveDestination + 1;
+            } else if (StartY > getResources().getDisplayMetrics().heightPixels - TouchAreaSize) {
+                MoveDestination = MoveDestination + 2;
+            }
+            if (StartX < TouchAreaSize) {
+                MoveDestination = MoveDestination + 4;
+            } else if (StartX > getResources().getDisplayMetrics().widthPixels - TouchAreaSize) {
+                MoveDestination = MoveDestination + 8;
+            }
+            Log.i("[Mica]", "MoveDestination:" + MoveDestination);
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            MoveDestination = 0;
             Log.i("[Mica]", "onTouch: 抬起");
         } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            if (MoveMode) {
-                // 处理接收到触摸事件并且 MoveDestination 被赋值时的操作
-                int MoveX = (int) event.getRawX() - StartX;
-                int MoveY = (int) event.getRawY() - StartY;
+            // 处理接收到触摸事件并且 MoveDestination 被赋值时的操作
+            int MoveX = (int) event.getRawX() - StartX;
+            int MoveY = (int) event.getRawY() - StartY;
+            // 移动后的位置
+            int MoveToX = ViewLeft - DEFAULT_VIEW_LOCATION + MoveX;
+            int MoveToY = ViewTop - DEFAULT_VIEW_LOCATION + MoveY;
+            switch (MoveDestination) {
+                case 5: // 左上向右下移动
+                    if (MoveToX > MoveAreaSize) { // 移动超出最大范围
+                        MoveX = MoveAreaSize - (ViewLeft - DEFAULT_VIEW_LOCATION);
+                    } else if (MoveToX < 0) { // 移动超出最小范围
+                        MoveX = DEFAULT_VIEW_LOCATION - ViewLeft;
+                    }
+                    if (MoveToY > MoveAreaSize) { // 移动超出最大范围
+                        MoveY = MoveAreaSize - (ViewTop - DEFAULT_VIEW_LOCATION);
+                    } else if (MoveToY < 0) { // 移动超出最小范围
+                        MoveY = DEFAULT_VIEW_LOCATION - ViewTop;
+                    }
+                    break;
+                case 9: // 右上向左下移动
+                    if (MoveToX < -MoveAreaSize) { // 移动超出最大范围
+                        MoveX = ViewLeft - DEFAULT_VIEW_LOCATION - MoveAreaSize;
+                    } else if (MoveToX > 0) { // 移动超出最小范围
+                        MoveX = DEFAULT_VIEW_LOCATION - ViewLeft;
+                    }
+                    if (MoveToY > MoveAreaSize) { // 移动超出最大范围
+                        MoveY = MoveAreaSize - (ViewTop - DEFAULT_VIEW_LOCATION);
+                    } else if (MoveToY < 0) { // 移动超出最小范围
+                        MoveY = DEFAULT_VIEW_LOCATION - ViewTop;
+                    }
+                    break;
+                case 6: // 左下向右上移动
+                    if (MoveToX > MoveAreaSize) { // 移动超出最大范围
+                        MoveX = MoveAreaSize - (ViewLeft - DEFAULT_VIEW_LOCATION);
+                    } else if (MoveToX < 0) { // 移动超出最小范围
+                        MoveX = DEFAULT_VIEW_LOCATION - ViewLeft;
+                    }
+                    if (MoveToY < -MoveAreaSize) { // 移动超出最大范围
+                        MoveY = ViewTop - DEFAULT_VIEW_LOCATION - MoveAreaSize;
+                    } else if (MoveToY > 0) { // 移动超出最小范围
+                        MoveY = DEFAULT_VIEW_LOCATION - ViewTop;
+                    }
+                    break;
+                case 10: // 右下向左上移动
+                    if (MoveToX < -MoveAreaSize) { // 移动超出最大范围
+                        MoveX = ViewLeft - DEFAULT_VIEW_LOCATION - MoveAreaSize;
+                    } else if (MoveToX > 0) { // 移动超出最小范围
+                        MoveX = DEFAULT_VIEW_LOCATION - ViewLeft;
+                    }
+                    if (MoveToY < -MoveAreaSize) { // 移动超出最大范围
+                        MoveY = ViewTop - DEFAULT_VIEW_LOCATION - MoveAreaSize;
+                    } else if (MoveToY > 0) { // 移动超出最小范围
+                        MoveY = DEFAULT_VIEW_LOCATION - ViewTop;
+                    }
+                    break;
+                default:
+                    MoveX = 0;
+                    MoveY = 0;
+                    break;
+            }
+            if (MoveX != 0 && MoveY != 0) {
                 Log.i("[Mica]", "onTouch: 移动X:" + MoveX + " Y:" + MoveY);
                 mXWalkView.layout(ViewLeft + MoveX, ViewTop + MoveY, ViewLeft + mXWalkView.getWidth() + MoveX, ViewTop + mXWalkView.getHeight() + MoveY);
-                mTextReset.setVisibility(View.VISIBLE);
                 // 在移动 XWalkView 时禁用右划返回
                 return false;
             }
         }
-        if (getWindow().superDispatchTouchEvent(event)) {
-            return true;
+
+        try{
+            return super.dispatchTouchEvent(event);
+        } catch(java.lang.RuntimeException e) {
+            if ( Objects.requireNonNull(e.getMessage()).compareTo("Crosswalk's APIs are not ready yet") == 0 ) {
+            } else {
+                throw e;
+            }
         }
         return onTouchEvent(event);
     }
@@ -97,7 +180,6 @@ public class BrowserActivity extends XWalkActivity {
         mXWalkView = binding.xwalkview;
         mImageMenu = binding.imageMenu;
         mProgressLoading = binding.progressLoading;
-        mTextReset = binding.textReset;
 
         // BottomSheet 初始化
         dialog = new BottomSheetDialog(this);
@@ -169,22 +251,6 @@ public class BrowserActivity extends XWalkActivity {
             return false;
         });
 
-        // 页面移动按钮事件
-        dialog.findViewById(R.id.dialog_button_zoom).setOnClickListener(view -> {
-            if (MoveMode) {
-                Toast.makeText(this, "WebView移动: 禁用", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "WebView移动: 启用", Toast.LENGTH_SHORT).show();
-            }
-            MoveMode = !MoveMode;
-        });
-
-        // WebView 重置按钮事件
-        mTextReset.setOnClickListener(view -> {
-            mXWalkView.layout(100, 100, mXWalkView.getWidth() + 100, mXWalkView.getHeight() + 100);
-            mTextReset.setVisibility(View.GONE);
-        });
-
         // 历史记录按钮事件
         dialog.findViewById(R.id.dialog_button_history).setOnClickListener(view -> {
             Intent menuIntent = new Intent(this, MenuActivity.class);
@@ -240,23 +306,41 @@ public class BrowserActivity extends XWalkActivity {
                 ((EditText) dialog.findViewById(R.id.text_url)).setText(mXWalkView.getUrl());
                 // 初始化标题文本框
                 ((TextView) dialog.findViewById(R.id.dialog_text_title)).setText(mXWalkView.getTitle());
-                Message trackMsg = new Message();
-                trackMsg.obj = "Webpage Load Finished, Browsed Once";
-                MainActivity.track.sendMessage(trackMsg);
+                // 浏览记录
+                if (Config.getUsageReport()) {
+                    try {
+                        // 获取程序包信息
+                        PackageInfo packageInfo = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0);
+                        // 获取程序信息
+                        ApplicationInfo applicationInfo = getBaseContext().getApplicationInfo();
+                        Message trackMsg = new Message();
+                        // 是否为 Debug 版本
+                        if ((applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+                            trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " [Debug] }";
+                        } else {
+                            trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " }";
+                        }
+                        MainActivity.track.sendMessage(trackMsg);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
         mXWalkView.setDownloadListener(new XWalkDownloadListener(getApplicationContext()) {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
                 String[] urlArray = url.split("/");
+                String DownloadedFileName = Download.getURLDecoderString(urlArray[urlArray.length - 1]);
                 Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
+                Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n开始下载", Toast.LENGTH_SHORT).show();
                 // 写下载项目
-                Global.data.putDownload(urlArray[urlArray.length - 1], Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
+                Global.data.putDownload(DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
                 // 下载 Thread
                 new Thread(() -> {
-                    if (!Download.fromUrl(url, urlArray[urlArray.length - 1], Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
+                    if (!Download.fromUrl(url, DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
                         Looper.prepare();
-                        Toast.makeText(MainActivity.mainActivity,urlArray[urlArray.length - 1] + "\n下载完成", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n下载完成", Toast.LENGTH_SHORT).show();
                         Looper.loop();
                     }
                 }).start();

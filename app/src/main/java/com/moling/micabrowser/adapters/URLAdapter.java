@@ -1,4 +1,4 @@
-package com.moling.micabrowser.data.adapters;
+package com.moling.micabrowser.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;

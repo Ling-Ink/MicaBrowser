@@ -29,16 +29,6 @@
                 android:layout_marginBottom="50dp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/text_reset"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_gravity="top|center"
-            android:background="#4075F0FE"
-            android:text="@string/browser_reset"
-            android:textAlignment="center"
-            android:visibility="gone" />
-
         <ImageView
             android:id="@+id/image_menu"
             android:layout_width="wrap_content"
