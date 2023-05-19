@@ -16,8 +16,6 @@ import com.moling.micabrowser.data.models.URLModel;
 import com.moling.micabrowser.ui.MainActivity;
 import com.moling.micabrowser.ui.MenuActivity;
 
-import java.util.Objects;
-
 public class MenuListener {
     public static AdapterView.OnItemClickListener HistoryClickListener(URLAdapter adapter) {
         AdapterView.OnItemClickListener listener = (parent, view, position, id) -> {

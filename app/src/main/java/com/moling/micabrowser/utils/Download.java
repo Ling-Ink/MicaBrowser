@@ -1,10 +1,14 @@
 package com.moling.micabrowser.utils;
 
+import android.net.Uri;
 import android.util.Log;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 参考：java从网络Url中下载文件并保存到本地 - 简书
@@ -55,6 +59,28 @@ public class Download {
         }
         return "";
 
+    }
+
+    /**
+     * 获取下载目标是否存在 Accept-Ranges 属性
+     * @param url
+     * @param userAgent
+     * @return
+     */
+    public static boolean acceptRanges(URL url, String userAgent) {
+        try {
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            // 使用 HEAD 请求获取信息
+            conn.setRequestMethod("HEAD");
+            conn.setRequestProperty("User-Agent", userAgent);
+            Map<String, List<String>> Headers = conn.getHeaderFields();
+            if (Headers.containsKey("Accept-Ranges")) {
+                return Objects.equals(Objects.requireNonNull(Headers.get("Accept-Ranges")).get(0).toLowerCase(), "bytes");
+            }
+            return false;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     /**

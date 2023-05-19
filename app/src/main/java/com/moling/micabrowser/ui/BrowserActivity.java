@@ -37,6 +37,8 @@ import org.xwalk.core.XWalkSettings;
 import org.xwalk.core.XWalkView;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
@@ -331,13 +333,16 @@ public class BrowserActivity extends XWalkActivity {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
                 String[] urlArray = url.split("/");
-                String DownloadedFileName = Download.getURLDecoderString(urlArray[urlArray.length - 1]);
+                String DownloadedFileName = Download.getURLDecoderString(urlArray[urlArray.length - 1]).split("\\?")[0];
                 Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
                 Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n开始下载", Toast.LENGTH_SHORT).show();
                 // 写下载项目
                 Global.data.putDownload(DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
                 // 下载 Thread
                 new Thread(() -> {
+                    try {
+                        Download.acceptRanges(new URL(url), userAgent);
+                    } catch (MalformedURLException e) { }
                     if (!Download.fromUrl(url, DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
                         Looper.prepare();
                         Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n下载完成", Toast.LENGTH_SHORT).show();
