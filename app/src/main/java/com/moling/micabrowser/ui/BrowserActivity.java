@@ -341,7 +341,7 @@ public class BrowserActivity extends XWalkActivity {
                 // 下载 Thread
                 new Thread(() -> {
                     try {
-                        Download.acceptRanges(new URL(url), userAgent);
+                        Download.getInfo(new URL(url), userAgent);
                     } catch (MalformedURLException e) { }
                     if (!Download.fromUrl(url, DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
                         Looper.prepare();

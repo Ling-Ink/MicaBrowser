@@ -1,6 +1,5 @@
 package com.moling.micabrowser.utils;
 
-import android.net.Uri;
 import android.util.Log;
 
 import java.io.*;
@@ -19,41 +18,42 @@ public class Download {
     /**
      * 从网络Url中下载文件
      *
-     * @param urlStr
-     * @param fileName
-     * @param savePath
-     * @throws IOException
+     * @param urlStr 将要下载的 URL 字符串
+     * @param fileName 保存文件名
+     * @param savePath 保存路径
+     * @param userAgent 下载 UA
      */
     public static String fromUrl(String urlStr, String fileName, String savePath, String userAgent) {
         try {
             Log.i("[Mica]", "Received Download Request:" + fileName);
             URL url = new URL(urlStr);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            // 设置超时间为3秒
-            conn.setConnectTimeout(3 * 1000);
-            // 防止屏蔽程序抓取而返回403错误
-            conn.setRequestProperty("User-Agent", userAgent);
-
-            // 得到输入流
-            InputStream inputStream = conn.getInputStream();
-            // 获取字节数组
-            byte[] getData = readInputStream(inputStream);
-
+            String[] downloadInfo = getInfo(url, userAgent);
+            // 是否存在可用的 Accept-Ranges 属性
+            boolean accept_Ranges = Boolean.parseBoolean(downloadInfo[0]);
+            // 文件大小
+            long content_Length = Long.parseLong(downloadInfo[1]);
             // 文件保存位置
-            File saveDir = new File(savePath);
-            if (!saveDir.exists()) {
-                saveDir.mkdir();
-            }
-            File file = new File(saveDir + File.separator + fileName);
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(getData);
-            if (fos != null) {
+            File file = new File(savePath + File.separator + fileName);
+            if (accept_Ranges) {
+                Log.i("[Mica]", "Download By Block");
+                downloadByBlock(url, userAgent, content_Length, file);
+            } else {
+                Log.i("[Mica]", "Download By Full");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("User-Agent", userAgent);
+
+                // 得到输入流
+                InputStream inputStream = conn.getInputStream();
+                // 获取字节数组
+                byte[] getData = readInputStream(inputStream);
+
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(getData);
                 fos.close();
-            }
-            if (inputStream != null) {
                 inputStream.close();
             }
-            return saveDir + File.separator + fileName;
+            Log.i("[Mica]", "Download Finished:" + fileName);
+            return savePath + File.separator + fileName;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,13 +61,44 @@ public class Download {
 
     }
 
+    public static void downloadByBlock(URL url, String userAgent, long contentLength, File saveFile) {
+        try(FileOutputStream fos = new FileOutputStream(saveFile)) {
+            long start = 0; long end = contentLength > 1024 ? 1023 : contentLength;
+            while (contentLength > 0) {
+                fos.write(getContentByRange(url, userAgent, start, end));
+                //Log.i("[Mica]", "Downloading Range: " + start + "-" + end);
+                start += 1024; end += 1024; contentLength -= 1024;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static byte[] getContentByRange(URL url, String userAgent, long start, long end) {
+        try {
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("User-Agent", userAgent);
+            // 设置下载区间
+            conn.setRequestProperty("Range", "bytes=" + start + "-" + end);
+            // 得到输入流
+            InputStream inputStream = conn.getInputStream();
+            // 获取字节数组
+            return readInputStream(inputStream);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
     /**
-     * 获取下载目标是否存在 Accept-Ranges 属性
-     * @param url
-     * @param userAgent
-     * @return
+     * 获取下载目标属性
+     *
+     * @param url 下载 URL 对象
+     * @param userAgent 下载 UA
+     * @return String[ Accept-Range, Content-Length ]
      */
-    public static boolean acceptRanges(URL url, String userAgent) {
+    public static String[] getInfo(URL url, String userAgent) {
+        boolean Accept_Ranges = false;
+        int Content_Length;
         try {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             // 使用 HEAD 请求获取信息
@@ -75,20 +106,19 @@ public class Download {
             conn.setRequestProperty("User-Agent", userAgent);
             Map<String, List<String>> Headers = conn.getHeaderFields();
             if (Headers.containsKey("Accept-Ranges")) {
-                return Objects.equals(Objects.requireNonNull(Headers.get("Accept-Ranges")).get(0).toLowerCase(), "bytes");
+                Accept_Ranges = Objects.equals(Objects.requireNonNull(Headers.get("Accept-Ranges")).get(0).toLowerCase(), "bytes");
             }
-            return false;
+            Content_Length = Integer.parseInt(Objects.requireNonNull(Headers.get("Content-Length")).get(0));
+            return new String[]{String.valueOf(Accept_Ranges), String.valueOf(Content_Length)};
         } catch (IOException e) {
-            return false;
+            return new String[]{String.valueOf(false), String.valueOf(0)};
         }
     }
 
     /**
      * 从输入流中获取字节数组
      *
-     * @param inputStream
-     * @return
-     * @throws IOException
+     * @param inputStream 输入流
      */
     public static byte[] readInputStream(InputStream inputStream) throws IOException {
         byte[] buffer = new byte[1024];
@@ -103,8 +133,7 @@ public class Download {
 
     /**
      * 对 URL 编码进行解码
-     * @param str
-     * @return
+     * @param str 待解码的 URL 编码字符串
      */
     public static String getURLDecoderString(String str) {
         String result = "";

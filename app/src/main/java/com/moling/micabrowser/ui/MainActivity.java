@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import com.moling.micabrowser.databinding.ActivityMainBinding;
+import com.moling.micabrowser.services.DownloadService;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Global;
 import com.moling.micabrowser.data.Data;
@@ -33,6 +34,7 @@ public class MainActivity extends Activity {
     @SuppressLint("StaticFieldLeak")
     public static MainActivity mainActivity;
     private ActivityMainBinding binding;
+    private Intent DownloadService;
     // Handlers
     public static Handler search;
     public static Handler track;
@@ -56,6 +58,10 @@ public class MainActivity extends Activity {
         AppCenter.start(getApplication(), "b0ecf30c-9f42-4d12-81ea-8f42a5e20158",
                 Analytics.class, Crashes.class);
         Analytics.startSession();
+
+        // 启动下载服务
+        DownloadService = new Intent(this, DownloadService.class);
+        startService(DownloadService);
 
         // 从 assets 中读取域名后缀列表
         try (InputStream input = getAssets().open("tlds-alpha-by-domain.txt")) {

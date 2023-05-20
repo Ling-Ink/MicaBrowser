@@ -47,6 +47,8 @@
         </activity>
         <activity android:name=".ui.MenuActivity" />
         <activity android:name=".ui.NoteActivity" />
+
+        <service android:name=".services.DownloadService" />
     </application>
 
 </manifest>
