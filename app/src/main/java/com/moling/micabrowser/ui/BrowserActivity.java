@@ -182,6 +182,88 @@ public class BrowserActivity extends XWalkActivity {
         mXWalkView = binding.xwalkview;
         mImageMenu = binding.imageMenu;
         mProgressLoading = binding.progressLoading;
+    }
+
+    // XWalkView 准备完毕事件
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    protected void onXWalkReady() {
+        XWalkSettings settings = mXWalkView.getSettings();
+        // XWalkView 设置
+        settings.setInitialPageScale(100); // 设置缩放比例
+        settings.setJavaScriptEnabled(true); // 启用 JavaScript 支持
+        settings.setJavaScriptCanOpenWindowsAutomatically(true); // 启用 JS 跳转
+        settings.setAllowFileAccess(true);
+        settings.setDomStorageEnabled(true);
+        settings.setAllowContentAccess(true);
+        // XWalkView 事件监听
+        mXWalkView.setResourceClient(new XWalkResourceClient(this.mXWalkView) {
+            @Override
+            public void onProgressChanged(XWalkView view, int i) {
+                Log.d("[Mica]", "<Progress> | " + i);
+                mProgressLoading.setProgress(i);
+            }
+            @Override
+            public void onLoadStarted(XWalkView view, String url) {
+                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
+                Log.d("[Mica]", "<LoadStarted> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
+            }
+            @Override
+            public void onLoadFinished(XWalkView view, String url) {
+                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
+                Log.d("[Mica]", "<LoadFinished> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
+                mProgressLoading.setProgress(0);
+                // 初始化 URL 文本框
+                ((EditText) dialog.findViewById(R.id.text_url)).setText(mXWalkView.getUrl());
+                // 初始化标题文本框
+                ((TextView) dialog.findViewById(R.id.dialog_text_title)).setText(mXWalkView.getTitle());
+                // 浏览记录
+                if (Config.getUsageReport()) {
+                    try {
+                        // 获取程序包信息
+                        PackageInfo packageInfo = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0);
+                        // 获取程序信息
+                        ApplicationInfo applicationInfo = getBaseContext().getApplicationInfo();
+                        Message trackMsg = new Message();
+                        // 是否为 Debug 版本
+                        if ((applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+                            trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " [Debug] }";
+                        } else {
+                            trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " }";
+                        }
+                        MainActivity.track.sendMessage(trackMsg);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        mXWalkView.setDownloadListener(new XWalkDownloadListener(getApplicationContext()) {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                String[] urlArray = url.split("/");
+                String DownloadedFileName = Download.getURLDecoderString(urlArray[urlArray.length - 1]).split("\\?")[0];
+                Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
+                Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n开始下载", Toast.LENGTH_SHORT).show();
+                // 写下载项目
+                Global.data.putDownload(DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
+                // 下载 Thread
+                new Thread(() -> {
+                    try {
+                        Download.getInfo(new URL(url), userAgent);
+                    } catch (MalformedURLException e) { }
+                    if (!Download.fromUrl(url, DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n下载完成", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                }).start();
+            }
+        });
+        // 加载 Url
+        String url = getIntent().getData().toString();
+        Log.d("[Mica]", "<BrowserActivity> | LoadURL - " + url);
+        mXWalkView.loadUrl(url);
 
         // BottomSheet 初始化
         dialog = new BottomSheetDialog(this);
@@ -273,87 +355,5 @@ public class BrowserActivity extends XWalkActivity {
             menuIntent.setData(Uri.parse(Constants.MENU_TYPE_DOWNLOAD));
             startActivity(menuIntent);
         });
-    }
-
-    // XWalkView 准备完毕事件
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    protected void onXWalkReady() {
-        XWalkSettings settings = mXWalkView.getSettings();
-        // XWalkView 设置
-        settings.setInitialPageScale(100); // 设置缩放比例
-        settings.setJavaScriptEnabled(true); // 启用 JavaScript 支持
-        settings.setJavaScriptCanOpenWindowsAutomatically(true); // 启用 JS 跳转
-        settings.setAllowFileAccess(true);
-        settings.setDomStorageEnabled(true);
-        settings.setAllowContentAccess(true);
-        // XWalkView 事件监听
-        mXWalkView.setResourceClient(new XWalkResourceClient(this.mXWalkView) {
-            @Override
-            public void onProgressChanged(XWalkView view, int i) {
-                Log.d("[Mica]", "<Progress> | " + i);
-                mProgressLoading.setProgress(i);
-            }
-            @Override
-            public void onLoadStarted(XWalkView view, String url) {
-                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
-                Log.d("[Mica]", "<LoadStarted> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
-            }
-            @Override
-            public void onLoadFinished(XWalkView view, String url) {
-                Global.data.putHistory(mXWalkView.getTitle(), mXWalkView.getUrl());
-                Log.d("[Mica]", "<LoadFinished> | " + mXWalkView.getTitle() + " - " + mXWalkView.getUrl());
-                mProgressLoading.setProgress(0);
-                // 初始化 URL 文本框
-                ((EditText) dialog.findViewById(R.id.text_url)).setText(mXWalkView.getUrl());
-                // 初始化标题文本框
-                ((TextView) dialog.findViewById(R.id.dialog_text_title)).setText(mXWalkView.getTitle());
-                // 浏览记录
-                if (Config.getUsageReport()) {
-                    try {
-                        // 获取程序包信息
-                        PackageInfo packageInfo = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0);
-                        // 获取程序信息
-                        ApplicationInfo applicationInfo = getBaseContext().getApplicationInfo();
-                        Message trackMsg = new Message();
-                        // 是否为 Debug 版本
-                        if ((applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
-                            trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " [Debug] }";
-                        } else {
-                            trackMsg.obj = "Browsed Once With Version { " + packageInfo.versionName + " }";
-                        }
-                        MainActivity.track.sendMessage(trackMsg);
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        mXWalkView.setDownloadListener(new XWalkDownloadListener(getApplicationContext()) {
-            @Override
-            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                String[] urlArray = url.split("/");
-                String DownloadedFileName = Download.getURLDecoderString(urlArray[urlArray.length - 1]).split("\\?")[0];
-                Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
-                Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n开始下载", Toast.LENGTH_SHORT).show();
-                // 写下载项目
-                Global.data.putDownload(DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
-                // 下载 Thread
-                new Thread(() -> {
-                    try {
-                        Download.getInfo(new URL(url), userAgent);
-                    } catch (MalformedURLException e) { }
-                    if (!Download.fromUrl(url, DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
-                        Looper.prepare();
-                        Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n下载完成", Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                    }
-                }).start();
-            }
-        });
-        // 加载 Url
-        String url = getIntent().getData().toString();
-        Log.d("[Mica]", "<BrowserActivity> | LoadURL - " + url);
-        mXWalkView.loadUrl(url);
     }
 }
