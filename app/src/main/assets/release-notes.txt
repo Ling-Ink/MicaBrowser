@@ -1,3 +1,10 @@
+REL-AL 0.4
+    添加:
+     - 下载进度条
+    修复:
+     - 由于过早调用 XWalkView 方法导致的 Crosswalk's APIs are not ready yet 错误
+    重写:
+     - 下载功能
 Rel-AL 0.3
     添加:
      - 单击复制下载文件路径

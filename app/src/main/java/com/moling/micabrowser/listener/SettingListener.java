@@ -6,7 +6,7 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.AdapterView;
 
-import com.moling.micabrowser.adapters.SettingAdapter;
+import com.moling.micabrowser.data.adapters.SettingAdapter;
 import com.moling.micabrowser.ui.MainActivity;
 import com.moling.micabrowser.ui.MenuActivity;
 import com.moling.micabrowser.utils.Config;

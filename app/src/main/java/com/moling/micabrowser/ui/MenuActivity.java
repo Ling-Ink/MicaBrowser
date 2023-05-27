@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -13,16 +14,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.moling.micabrowser.R;
-import com.moling.micabrowser.adapters.SettingAdapter;
-import com.moling.micabrowser.adapters.URLAdapter;
-import com.moling.micabrowser.adapters.MenuAdapter;
+import com.moling.micabrowser.data.adapters.DownloadAdapter;
+import com.moling.micabrowser.data.adapters.SettingAdapter;
+import com.moling.micabrowser.data.adapters.URLAdapter;
+import com.moling.micabrowser.data.adapters.MenuAdapter;
 import com.moling.micabrowser.data.Settings;
 import com.moling.micabrowser.listener.MenuListener;
 import com.moling.micabrowser.data.models.DownloadModel;
 import com.moling.micabrowser.databinding.ActivityMenuBinding;
 import com.moling.micabrowser.listener.SettingListener;
+import com.moling.micabrowser.services.DownloadService;
 import com.moling.micabrowser.utils.Config;
 import com.moling.micabrowser.utils.Constants;
+import com.moling.micabrowser.utils.Global;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +46,10 @@ public class MenuActivity extends Activity {
     public static Handler setURLAdapter;
     public static Handler setDownloadAdapter;
     public static Handler setSettingAdapter;
+
+    String[] settingKey;
+    Object[] settingParam;
+
     @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +58,6 @@ public class MenuActivity extends Activity {
         setContentView(binding.getRoot());
         menuActivity = this;
 
-        String[] settingKey;
-        Object[] settingParam;
-
         // 控件绑定
         mTextMenuTitle = binding.textMenuTitle;
         mListMenu = binding.listMenu;
@@ -60,6 +65,8 @@ public class MenuActivity extends Activity {
         // 菜单类型
         menuType = getIntent().getData().toString();
 
+        // 刷新菜单
+        mTextMenuTitle.setOnClickListener(v -> loadList());
         // URLAdapter Handler
         setURLAdapter = new Handler(){
             @Override
@@ -71,7 +78,14 @@ public class MenuActivity extends Activity {
         setDownloadAdapter = new Handler(){
             @Override
             public void handleMessage(@NonNull Message msg) {
-                mListMenu.setAdapter((ArrayAdapter<String>) msg.obj);
+                mListMenu.setAdapter((DownloadAdapter) msg.obj);
+                mTextMenuTitle.setOnClickListener(v -> {
+                    for (int i = 0; i < MainActivity.downloadProgress.size(); i++) {
+                        String hash = (String) MainActivity.downloadProgress.keySet().toArray()[i];
+                        Global.data.progressDownload(hash, MainActivity.downloadProgress.get(hash));
+                    }
+                    loadList();
+                });
             }
         };
         // SettingAdapter Handler
@@ -81,8 +95,10 @@ public class MenuActivity extends Activity {
                 mListMenu.setAdapter((SettingAdapter) msg.obj);
             }
         };
+        loadList();
+    }
 
-        // 设置 Listener 以及 Adapter
+    private void loadList() {// 设置 Listener 以及 Adapter
         Message adapterMsg = new Message();
         Object adapter;
         switch (menuType) {
@@ -109,7 +125,7 @@ public class MenuActivity extends Activity {
             case Constants.MENU_TYPE_DOWNLOAD:
                 mTextMenuTitle.setText(getString(R.string.menu_download));
 
-                adapterMsg.obj = dumpDownloadsList(MenuAdapter.DownloadAdapter());
+                adapterMsg.obj = new DownloadAdapter(getLayoutInflater(), MenuAdapter.DownloadAdapter());
                 setDownloadAdapter.sendMessage(adapterMsg);
 
                 itemClickListener = MenuListener.DownloadClickListener();
@@ -155,13 +171,5 @@ public class MenuActivity extends Activity {
         // 设置 listener
         if (itemClickListener != null) mListMenu.setOnItemClickListener((adapterView, view, i, l) -> itemClickListener.onItemClick(adapterView, view, i, l));
         if (itemLongClickListener != null) mListMenu.setOnItemLongClickListener((adapterView, view, i, l) -> itemLongClickListener.onItemLongClick(adapterView, view, i, l));
-    }
-
-    public static ArrayAdapter<String> dumpDownloadsList(List<DownloadModel> downloadModels) {
-        List<String> downloads = new ArrayList<>();
-        for (int i = 0; i < downloadModels.size(); i++) {
-            downloads.add(downloadModels.get(i).getName());
-        }
-        return new ArrayAdapter<>(MenuActivity.menuActivity, android.R.layout.simple_list_item_1, downloads);
     }
 }

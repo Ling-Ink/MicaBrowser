@@ -21,7 +21,8 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
         android:hardwareAccelerated="true"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config">
         <uses-library
             android:name="com.google.android.wearable"
             android:required="true" />
@@ -47,6 +48,8 @@
         </activity>
         <activity android:name=".ui.MenuActivity" />
         <activity android:name=".ui.NoteActivity" />
+
+        <service android:name=".services.DownloadService" />
     </application>
 
 </manifest>

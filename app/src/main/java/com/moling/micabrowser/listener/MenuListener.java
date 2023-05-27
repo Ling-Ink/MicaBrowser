@@ -9,14 +9,14 @@ import android.view.LayoutInflater;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import com.moling.micabrowser.data.adapters.DownloadAdapter;
+import com.moling.micabrowser.services.DownloadService;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Global;
-import com.moling.micabrowser.adapters.URLAdapter;
+import com.moling.micabrowser.data.adapters.URLAdapter;
 import com.moling.micabrowser.data.models.URLModel;
 import com.moling.micabrowser.ui.MainActivity;
 import com.moling.micabrowser.ui.MenuActivity;
-
-import java.util.Objects;
 
 public class MenuListener {
     public static AdapterView.OnItemClickListener HistoryClickListener(URLAdapter adapter) {
@@ -88,7 +88,9 @@ class MenuListenerUtils {
             case Constants.MENU_TYPE_HISTORY:
                 Global.data.delHistory(position);
                 adapterMsg = new Message();
-                adapterMsg.obj = new URLAdapter(inflater, Global.data.getHistory());
+                URLAdapter adapter = new URLAdapter(inflater, Global.data.getHistory());
+                adapter.notifyDataSetChanged();
+                adapterMsg.obj = adapter;
                 MenuActivity.setURLAdapter.sendMessage(adapterMsg);
                 break;
             case Constants.MENU_TYPE_BOOKMARK:
@@ -100,7 +102,7 @@ class MenuListenerUtils {
             case Constants.MENU_TYPE_DOWNLOAD:
                 Global.data.delDownload(position);
                 adapterMsg = new Message();
-                adapterMsg.obj = MenuActivity.dumpDownloadsList(Global.data.getDownload());
+                adapterMsg.obj = new DownloadAdapter(MainActivity.mainActivity.getLayoutInflater(), Global.data.getDownload());
                 MenuActivity.setDownloadAdapter.sendMessage(adapterMsg);
                 break;
         }
