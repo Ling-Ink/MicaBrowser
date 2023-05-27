@@ -42,6 +42,7 @@ import org.xwalk.core.XWalkView;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 
@@ -245,19 +246,21 @@ public class BrowserActivity extends XWalkActivity {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
                 String[] urlArray = url.split("/");
-                String DownloadedFileName = Download.getURLDecoderString(urlArray[urlArray.length - 1]).split("\\?")[0];
+                String downloadedFileName = Download.getURLDecoderString(urlArray[urlArray.length - 1]).split("\\?")[0];
                 Log.d("[Mica]", "url: " + url + " | UA: " + userAgent + " | contentDisposition: " + contentDisposition + " | contentLength: " + contentLength);
-                Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n开始下载", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.mainActivity,downloadedFileName + "\n开始下载", Toast.LENGTH_SHORT).show();
+                String downloadLoc = Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1];
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                String downloadHash = String.valueOf((downloadedFileName + timestamp.getTime()).hashCode());
                 // 写下载项目
-                Global.data.putDownload(DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
+                Global.data.putDownload(
+                        downloadedFileName,
+                        downloadLoc,
+                        downloadHash,
+                        0);
                 // 下载
-                MultiDownloadHelper multiDownloadHelper = new MultiDownloadHelper(3, url, DownloadedFileName);
-                multiDownloadHelper.download((size, totalSize) -> {
-                    float progress = ((float) size / (float) totalSize) * 100;
-                    Log.d("[Mica]", ">>>>>>current pgValue->" + progress);
-                });
                 Intent downloadService = new Intent(MainActivity.mainActivity, DownloadService.class);
-                downloadService.setData(Uri.parse(url + "@" + DownloadedFileName));
+                downloadService.setData(Uri.parse(url + "@" + downloadedFileName + "@" + downloadHash));
                 startService(downloadService);
             }
         });

@@ -123,24 +123,40 @@ public class Data {
         for (int i = JsonArr.size() - 1; i >= 0 ; i--) {
             model.add(new DownloadModel(
                     JsonArr.getJSONObject(i).getString("name"),
-                    JsonArr.getJSONObject(i).getString("location")
+                    JsonArr.getJSONObject(i).getString("location"),
+                    // 旧版本兼容
+                    JsonArr.getJSONObject(i).containsKey("hash") ? JsonArr.getJSONObject(i).getString("hash") : "",
+                    JsonArr.getJSONObject(i).containsKey("progress") ? JsonArr.getJSONObject(i).getFloat("progress") : 0
             ));
         }
         return model;
     }
-    public void putDownload(String name, String location) {
+    public void putDownload(String name, String location, String hash, float progress) {
         String JsonStr = Stream.Read(file);
         JSONObject JsonObj = JSON.parseObject(JsonStr);
         JSONArray JsonArr = JsonObj.getJSONArray("downloads");
-        JSONObject Bookmark = new JSONObject();
-        Bookmark.put("name", name);
-        Bookmark.put("location", location);
-        JsonArr.add(Bookmark);
+        JSONObject Download = new JSONObject();
+        Download.put("name", name);
+        Download.put("location", location);
+        Download.put("hash", hash);
+        Download.put("progress", progress);
+        JsonArr.add(Download);
         Stream.write(JsonObj.toString(), file);
+    }
+    public void progressDownload(String hash, float progress) {
+        String JsonStr = Stream.Read(file);
+        JSONObject JsonObj = JSON.parseObject(JsonStr);
+        JSONArray JsonArr = JsonObj.getJSONArray("downloads");
+        for (int i = 0; i < JsonArr.size(); i++) {
+            if (Objects.equals(JsonArr.getJSONObject(i).getString("hash"), hash)) {
+                JsonArr.getJSONObject(i).replace("progress", progress);
+                Stream.write(JsonObj.toString(), file);
+            }
+        }
     }
     public void delDownload(int position) {
         String JsonStr = Stream.Read(file);
-        JSONObject JsonObj = JSON.parseObject(JsonStr);;
+        JSONObject JsonObj = JSON.parseObject(JsonStr);
         JSONArray JsonArr = JsonObj.getJSONArray("downloads");
         JsonArr.remove(JsonArr.size() - position - 1);
         Stream.write(JsonObj.toString(), file);

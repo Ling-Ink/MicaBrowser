@@ -3,9 +3,13 @@ package com.moling.micabrowser.download;
 import static android.content.Context.DOWNLOAD_SERVICE;
 
 import android.os.Environment;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+
+import com.moling.micabrowser.ui.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,6 +130,9 @@ public class MultiDownloadHelper {
                                 downloadListener.onDownload(length,totalSize);
                             }
                             Log.d(TAG, ">>>>>>线程" + (threadId + 1) + "已下载完成");
+                            Message downloadFinish = new Message();
+                            downloadFinish.obj = downloadFileName + "\n下载完成";
+                            MainActivity.toast.sendMessage(downloadFinish);
                         }
                     } catch (Exception e) {
                         Log.e(TAG, ">>>>>>线程:" + threadId + " 下载出错: " + e.getMessage(), e);
@@ -164,7 +171,7 @@ public class MultiDownloadHelper {
 
                 //结束的回调
                 @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                public void onResponse(@NonNull Call call, @NonNull Response response) {
                     //响应码可能是404也可能是200都会走这个方法
                     Log.i(TAG, ">>>>>>the response code is: " + response.code());
                     if (200 == response.code()) {
@@ -174,11 +181,11 @@ public class MultiDownloadHelper {
                             long size = response.body().contentLength();
                             Log.d(TAG, ">>>>>>file length->" + size);
                             for (int i = 0; i < threadCount; i++) {
-                                EnumMap<DownLoadThreadInfo, Object> downLoadThreadInforObjectEnumMap = new EnumMap<DownLoadThreadInfo, Object>(DownLoadThreadInfo.class);
-                                downLoadThreadInforObjectEnumMap = calcStartPosition(size, i);
+                                EnumMap<DownLoadThreadInfo, Object> downLoadThreadInfoObjectEnumMap;
+                                downLoadThreadInfoObjectEnumMap = calcStartPosition(size, i);
                                 String threadFileName = generateTempFile(size);
-                                int startPosition = (int) downLoadThreadInforObjectEnumMap.get(DownLoadThreadInfo.startPosition);
-                                int threadLength = (int) downLoadThreadInforObjectEnumMap.get(DownLoadThreadInfo.threadLength);
+                                int startPosition = (int) downLoadThreadInfoObjectEnumMap.get(DownLoadThreadInfo.startPosition);
+                                int threadLength = (int) downLoadThreadInfoObjectEnumMap.get(DownLoadThreadInfo.threadLength);
                                 RandomAccessFile threadFile = new RandomAccessFile(threadFileName, "rwd");
                                 threadFile.seek(startPosition);
                                 new DownLoadThread(i, startPosition, threadFile, threadLength, downloadFilePath,downloadListener,(int)size).start();

@@ -10,14 +10,19 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.moling.micabrowser.data.adapters.DownloadAdapter;
 import com.moling.micabrowser.download.MultiDownloadHelper;
+import com.moling.micabrowser.ui.MainActivity;
+import com.moling.micabrowser.utils.Global;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class DownloadService extends Service {
-
     /**
      * 绑定服务时才会调用
      * 必须要实现的方法
-     * @param intent
      */
     @Nullable @Override public IBinder onBind(Intent intent) {
         return null;
@@ -29,24 +34,29 @@ public class DownloadService extends Service {
      */
     @SuppressLint("HandlerLeak") @Override public void onCreate() {
         System.out.println("onCreate invoke");
+        MainActivity.downloadProgress = new HashMap<>();
         super.onCreate();
     }
 
     /**
      * 每次通过startService()方法启动Service时都会被回调。
-     * @param intent
-     * @param flags
-     * @param startId
      */
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
         System.out.println("onStartCommand invoke");
         if (intent.getData() != null) {
             String[] downParam = intent.getData().toString().split("@");
+            String downloadHash = downParam[2];
             Log.i("[Mica]", "Service getData Download: " + downParam[0] + " | " + downParam[1]);
-            MultiDownloadHelper multiDownloadHelper = new MultiDownloadHelper(3, downParam[0], downParam[1]);
+            MultiDownloadHelper multiDownloadHelper = new MultiDownloadHelper(1, downParam[0], downParam[1]);
             multiDownloadHelper.download((size, totalSize) -> {
                 float progress = ((float) size / (float) totalSize) * 100;
-                Log.d("[Mica]", ">>>>>>current pgValue->" + progress);
+                //Log.d("[Mica]", ">>>>>>current pgValue->" + progress);
+                if (MainActivity.downloadProgress.containsKey(downloadHash)) {
+                    MainActivity.downloadProgress.replace(downloadHash, progress);
+                } else {
+                    MainActivity.downloadProgress.put(downloadHash, progress);
+                }
+                //Global.data.progressDownload(downloadHash, progress);
             });
         }
         return super.onStartCommand(intent, flags, startId);

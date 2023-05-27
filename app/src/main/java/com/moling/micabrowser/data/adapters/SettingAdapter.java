@@ -1,4 +1,4 @@
-package com.moling.micabrowser.adapters;
+package com.moling.micabrowser.data.adapters;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
