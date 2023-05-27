@@ -105,6 +105,7 @@ public class Download {
             conn.setRequestMethod("HEAD");
             conn.setRequestProperty("User-Agent", userAgent);
             Map<String, List<String>> Headers = conn.getHeaderFields();
+            Log.i("[Mica]", "Download File Info: " + Headers);
             if (Headers.containsKey("Accept-Ranges")) {
                 Accept_Ranges = Objects.equals(Objects.requireNonNull(Headers.get("Accept-Ranges")).get(0).toLowerCase(), "bytes");
             }

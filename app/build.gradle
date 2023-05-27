@@ -10,8 +10,8 @@ android {
         applicationId "com.moling.micabrowser"
         minSdk 28
         targetSdk 33
-        versionCode 3
-        versionName "Rel-AL 0.3"
+        versionCode 4
+        versionName "Rel-AL 0.4"
         resConfigs 'en','cn'
     }
 
@@ -46,11 +46,16 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.aar'])
     // BottomSheetDialog
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     // FastJson
     implementation 'com.alibaba.fastjson2:fastjson2:2.0.25'
     // Microsoft AppCenter
     def appCenterSdkVersion = '4.4.5'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+    // OkHttp3
+    implementation "com.squareup.okhttp3:okhttp:4.9.1"
+    // Apache Commons
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation 'commons-io:commons-io:2.12.0'
 }

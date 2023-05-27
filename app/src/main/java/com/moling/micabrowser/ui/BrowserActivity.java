@@ -22,6 +22,9 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.moling.micabrowser.R;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
+import com.moling.micabrowser.download.DownloadListener;
+import com.moling.micabrowser.download.MultiDownloadHelper;
+import com.moling.micabrowser.services.DownloadService;
 import com.moling.micabrowser.utils.Config;
 import com.moling.micabrowser.utils.Constants;
 import com.moling.micabrowser.utils.Download;
@@ -247,17 +250,15 @@ public class BrowserActivity extends XWalkActivity {
                 Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n开始下载", Toast.LENGTH_SHORT).show();
                 // 写下载项目
                 Global.data.putDownload(DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath() + File.separator + urlArray[urlArray.length - 1]);
-                // 下载 Thread
-                new Thread(() -> {
-                    try {
-                        Download.getInfo(new URL(url), userAgent);
-                    } catch (MalformedURLException e) { }
-                    if (!Download.fromUrl(url, DownloadedFileName, Environment.getExternalStoragePublicDirectory(DOWNLOAD_SERVICE).getAbsolutePath(), userAgent).equals("")) {
-                        Looper.prepare();
-                        Toast.makeText(MainActivity.mainActivity,DownloadedFileName + "\n下载完成", Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                    }
-                }).start();
+                // 下载
+                MultiDownloadHelper multiDownloadHelper = new MultiDownloadHelper(3, url, DownloadedFileName);
+                multiDownloadHelper.download((size, totalSize) -> {
+                    float progress = ((float) size / (float) totalSize) * 100;
+                    Log.d("[Mica]", ">>>>>>current pgValue->" + progress);
+                });
+                Intent downloadService = new Intent(MainActivity.mainActivity, DownloadService.class);
+                downloadService.setData(Uri.parse(url + "@" + DownloadedFileName));
+                startService(downloadService);
             }
         });
         // 加载 Url

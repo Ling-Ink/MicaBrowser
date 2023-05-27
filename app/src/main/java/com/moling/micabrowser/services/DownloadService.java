@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.moling.micabrowser.download.MultiDownloadHelper;
+
 public class DownloadService extends Service {
-    public static Handler DownloadHandler;
 
     /**
      * 绑定服务时才会调用
@@ -27,12 +29,6 @@ public class DownloadService extends Service {
      */
     @SuppressLint("HandlerLeak") @Override public void onCreate() {
         System.out.println("onCreate invoke");
-        DownloadHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                String downUrl = (String) msg.obj;
-            }
-        };
         super.onCreate();
     }
 
@@ -44,6 +40,15 @@ public class DownloadService extends Service {
      */
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
         System.out.println("onStartCommand invoke");
+        if (intent.getData() != null) {
+            String[] downParam = intent.getData().toString().split("@");
+            Log.i("[Mica]", "Service getData Download: " + downParam[0] + " | " + downParam[1]);
+            MultiDownloadHelper multiDownloadHelper = new MultiDownloadHelper(3, downParam[0], downParam[1]);
+            multiDownloadHelper.download((size, totalSize) -> {
+                float progress = ((float) size / (float) totalSize) * 100;
+                Log.d("[Mica]", ">>>>>>current pgValue->" + progress);
+            });
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
