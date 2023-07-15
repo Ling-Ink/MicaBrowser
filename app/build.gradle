@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "com.moling.micabrowser"
-        minSdk 28
+        minSdk 27
         targetSdk 33
-        versionCode 4
-        versionName "Rel-AL 0.4"
+        versionCode 5
+        versionName "Rel-AL 0.5"
         resConfigs 'en','cn'
     }
 

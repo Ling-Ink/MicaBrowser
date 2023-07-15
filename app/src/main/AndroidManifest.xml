@@ -23,9 +23,9 @@
         android:hardwareAccelerated="true"
         android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config">
-        <uses-library
+        <!--uses-library
             android:name="com.google.android.wearable"
-            android:required="true" />
+            android:required="true" /-->
 
         <!--
                Set to true if your app is Standalone, that is, it does not require the handheld
