@@ -1,16 +1,16 @@
 <resources>
-    <string name="app_name">MicaBrowser</string>
-    <string name="menu_history">历史</string>
-    <string name="menu_bookmark">书签</string>
-    <string name="menu_download">下载</string>
-    <string name="menu_about">关于</string>
-    <string name="text_searchbox">搜索</string>
-    <string name="about_note">更新日志</string>
-    <string name="about_github">Github 地址</string>
-    <string name="about_project" translatable="false">Mica Project</string>
-    <string name="menu_setting">设置</string>
+    <string name="app_name" translatable="false">MicaBrowser</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
     -->
+    <string name="btn_history">历史</string>
+    <string name="btn_bookmark">书签</string>
+    <string name="btn_download">下载</string>
+    <string name="btn_about">关于</string>
+    <string name="btn_note">更新日志</string>
+    <string name="btn_github">Github 地址</string>
+    <string name="btn_project" translatable="false">Mica Project</string>
+    <string name="btn_setting">设置</string>
+    <string name="text_search">搜索</string>
 </resources>

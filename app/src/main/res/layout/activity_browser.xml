@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -34,9 +33,9 @@
             android:layout_width="wrap_content"
             android:layout_height="20dp"
             android:layout_gravity="bottom|center"
-            android:src="@drawable/menu_line" />
+            android:src="@drawable/baseline_expand_less_24" />
 
-        <com.moling.micabrowser.views.CircularProgressView
+        <com.moling.micabrowser.circularprogressview.CircularProgressView
             android:id="@+id/progress_loading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -46,10 +45,10 @@
             android:layout_marginBottom="-5dp"
             app:backColor="#00000000"
             app:backWidth="20dp"
-            app:progColor="#75F1FF"
+            app:progColor="#2979FF"
             app:progWidth="5dp"
             app:progress="65" />
 
     </FrameLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

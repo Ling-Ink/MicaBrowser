@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MicaBrowser</string>
-    <string name="menu_history">History</string>
-    <string name="menu_bookmark">Bookmark</string>
-    <string name="menu_download">Download</string>
-    <string name="menu_about">About</string>
-    <string name="text_searchbox">Search</string>
-    <string name="about_note">Update Note</string>
-    <string name="about_github">Github Page</string>
-    <string name="menu_setting">Settings</string>
+    <string name="btn_history">History</string>
+    <string name="btn_bookmark">Bookmarks</string>
+    <string name="btn_download">Downloads</string>
+    <string name="btn_about">About</string>
+    <string name="btn_note">Update Notes</string>
+    <string name="btn_github">Github Page</string>
+    <string name="btn_setting">Settings</string>
+    <string name="text_search">Search</string>
 </resources>
