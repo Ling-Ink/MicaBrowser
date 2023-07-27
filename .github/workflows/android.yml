@@ -3,8 +3,7 @@ name: Android CI
 on:
   workflow_dispatch:
   push:
-    tags:
-      - "Rel-*"
+    branches: [ "main" ]
 
 jobs:
   build:

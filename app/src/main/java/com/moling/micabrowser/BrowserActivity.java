@@ -1,37 +1,25 @@
 package com.moling.micabrowser;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.app.Dialog;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Message;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.widget.EditText;
-import android.widget.ImageButton;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import com.moling.micabrowser.circularprogressview.CircularProgressView;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
 
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkDownloadListener;
-import org.xwalk.core.XWalkNavigationHistory;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkSettings;
 import org.xwalk.core.XWalkView;
-
-import java.io.File;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Objects;
 
 public class BrowserActivity extends XWalkActivity {
     @SuppressLint("StaticFieldLeak")
@@ -57,6 +45,7 @@ public class BrowserActivity extends XWalkActivity {
         browserActivity = this;
 
         BindWidgets();
+        mImageMenu.setOnClickListener(v -> showMenu());
     }
 
     // XWalkView 准备完毕事件
@@ -98,5 +87,28 @@ public class BrowserActivity extends XWalkActivity {
         String url = getIntent().getData().toString();
         Log.d("[Mica]", "<BrowserActivity> | LoadURL - " + url);
         mXWalkView.loadUrl(url);
+    }
+
+    protected void showMenu() {
+        Dialog mMenuDialog = new Dialog(this, R.style.BottomDialog);
+        @SuppressLint("InflateParams") LinearLayout root = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.dialog_menu, null);
+
+        root.findViewById(R.id.button_close).setOnClickListener(v -> mMenuDialog.dismiss());
+
+        mMenuDialog.setContentView(root);
+        mMenuDialog.setCancelable(false);
+        Window dialogWindow = mMenuDialog.getWindow();
+        dialogWindow.setGravity(Gravity.BOTTOM);
+        //dialogWindow.setWindowAnimations(R.style.BottomDialog); // 添加动画
+        WindowManager.LayoutParams lp = dialogWindow.getAttributes(); // 获取对话框当前的参数值
+        lp.x = 0; // 新位置X坐标
+        lp.y = 0; // 新位置Y坐标
+        lp.width = (int) getResources().getDisplayMetrics().widthPixels; // 宽度
+        root.measure(0, 0);
+        lp.height = root.getMeasuredHeight();
+
+        lp.alpha = 9f; // 透明度
+        dialogWindow.setAttributes(lp);
+        mMenuDialog.show();
     }
 }

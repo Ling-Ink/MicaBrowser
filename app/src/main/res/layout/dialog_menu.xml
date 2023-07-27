@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/button_close"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/baseline_expand_more_24" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingTop="20dp">
+
+            <ImageButton
+                android:id="@+id/button_back"
+                style="@style/BrowserControlButton"
+                android:src="@drawable/baseline_arrow_back_24" />
+
+            <ImageButton
+                android:id="@+id/button_refresh"
+                style="@style/BrowserControlButton"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/baseline_refresh_24" />
+
+            <ImageButton
+                android:id="@+id/button_bookmark"
+                style="@style/BrowserControlButton"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/outline_grade_24" />
+
+            <ImageButton
+                android:id="@+id/button_forward"
+                style="@style/BrowserControlButton"
+                android:src="@drawable/baseline_arrow_forward_24" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="60dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/text_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/dialog_text_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:minEms="30"
+                android:textColor="#606060" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/button_history"
+                    style="@style/BrowserControlButton"
+                    android:src="@drawable/baseline_history_24" />
+
+                <ImageButton
+                    android:id="@+id/button_bookmarks"
+                    style="@style/BrowserControlButton"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/baseline_bookmark_24" />
+
+                <ImageButton
+                    android:id="@+id/button_download"
+                    style="@style/BrowserControlButton"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/baseline_download_24" />
+
+                <ImageButton
+                    android:id="@+id/button_zoom"
+                    style="@style/BrowserControlButton"
+                    android:src="@drawable/baseline_zoom_in_map_24" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

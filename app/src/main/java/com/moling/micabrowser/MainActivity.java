@@ -28,7 +28,6 @@ import com.moling.micabrowser.database.Database;
 import com.moling.micabrowser.databinding.ActivityMainBinding;
 import com.moling.micabrowser.datamigration.DataMigration;
 import com.moling.micabrowser.listeners.MainListeners;
-import com.moling.micabrowser.utils.ConfigUtils;
 import com.moling.micabrowser.utils.DomainUtils;
 
 public class MainActivity extends Activity {
