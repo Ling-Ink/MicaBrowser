@@ -1,11 +1,11 @@
 package com.moling.micabrowser.utils;
 
-import com.moling.micabrowser.database.DAO.BookmarkDAO;
-import com.moling.micabrowser.database.DAO.DownloadDAO;
-import com.moling.micabrowser.database.DAO.HistoryDAO;
-import com.moling.micabrowser.database.Entities.Bookmark;
-import com.moling.micabrowser.database.Entities.Download;
-import com.moling.micabrowser.database.Entities.History;
+import com.moling.micabrowser.data.database.DAO.BookmarkDAO;
+import com.moling.micabrowser.data.database.DAO.DownloadDAO;
+import com.moling.micabrowser.data.database.DAO.HistoryDAO;
+import com.moling.micabrowser.data.database.Entities.Bookmark;
+import com.moling.micabrowser.data.database.Entities.Download;
+import com.moling.micabrowser.data.database.Entities.History;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -35,7 +35,7 @@
             android:layout_gravity="bottom|center"
             android:src="@drawable/baseline_expand_less_24" />
 
-        <com.moling.micabrowser.circularprogressview.CircularProgressView
+        <com.moling.micabrowser.utils.circularprogressview.CircularProgressView
             android:id="@+id/progress_loading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

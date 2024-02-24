@@ -6,13 +6,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.moling.micabrowser.circularprogressview.CircularProgressView;
+import com.moling.micabrowser.utils.circularprogressview.CircularProgressView;
 import com.moling.micabrowser.databinding.ActivityBrowserBinding;
 
 import org.xwalk.core.XWalkActivity;

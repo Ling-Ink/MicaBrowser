@@ -17,6 +17,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".indev"
+            versionNameSuffix '-indev'
+            debuggable true
+            jniDebuggable true
+            manifestPlaceholders = [app_icon: "@mipmap/ic_launcher"]
+        }
         release {
             minifyEnabled true
             shrinkResources true
@@ -24,6 +31,7 @@ android {
             ndk {
                 abiFilters  'armeabi-v7a'
             }
+            manifestPlaceholders = [app_icon: "@mipmap/ic_launcher_debug"]
         }
     }
     buildFeatures {

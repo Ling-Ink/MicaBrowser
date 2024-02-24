@@ -1,4 +1,4 @@
-package com.moling.micabrowser.circularprogressview;
+package com.moling.micabrowser.utils.circularprogressview;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;

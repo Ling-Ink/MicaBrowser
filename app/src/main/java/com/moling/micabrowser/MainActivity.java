@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -21,16 +22,18 @@ import androidx.room.Room;
 import com.microsoft.appcenter.AppCenter;
 import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.crashes.Crashes;
-import com.moling.micabrowser.database.DAO.BookmarkDAO;
-import com.moling.micabrowser.database.DAO.DownloadDAO;
-import com.moling.micabrowser.database.DAO.HistoryDAO;
-import com.moling.micabrowser.database.Database;
+import com.moling.micabrowser.data.database.DAO.BookmarkDAO;
+import com.moling.micabrowser.data.database.DAO.DownloadDAO;
+import com.moling.micabrowser.data.database.DAO.HistoryDAO;
+import com.moling.micabrowser.data.database.Database;
 import com.moling.micabrowser.databinding.ActivityMainBinding;
-import com.moling.micabrowser.datamigration.DataMigration;
+import com.moling.micabrowser.data.datamigration.DataMigration;
 import com.moling.micabrowser.listeners.MainListeners;
 import com.moling.micabrowser.utils.DomainUtils;
 
 public class MainActivity extends Activity {
+    public static SharedPreferences.Editor preferencesEditor;
+    public static SharedPreferences sharedPreferences;
     private ActivityMainBinding binding;
 
     @SuppressLint("StaticFieldLeak")

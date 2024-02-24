@@ -1,4 +1,4 @@
-package com.moling.micabrowser.database.Entities;
+package com.moling.micabrowser.data.database.Entities;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
