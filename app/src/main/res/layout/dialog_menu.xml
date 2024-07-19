@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/layout_menu"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:background="#202020"
-    app:behavior_hideable="true"
-    app:behavior_peekHeight="300dp"
-    app:elevation="6dp"
-    app:layout_behavior="@string/bottom_sheet_behavior">
+    android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/button_close"
         android:layout_width="15dp"
         android:layout_height="15dp"
         android:layout_gravity="center_horizontal"
-        android:src="@drawable/menu_up" />
+        android:src="@drawable/baseline_expand_more_24" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,82 +28,84 @@
             <ImageButton
                 android:id="@+id/button_back"
                 style="@style/BrowserControlButton"
-                android:src="@drawable/arrow_left" />
+                android:src="@drawable/baseline_arrow_back_24" />
 
             <ImageButton
                 android:id="@+id/button_refresh"
                 style="@style/BrowserControlButton"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="4dp"
-                android:src="@drawable/arrow_refresh" />
+                android:src="@drawable/baseline_refresh_24" />
 
             <ImageButton
                 android:id="@+id/button_bookmark"
                 style="@style/BrowserControlButton"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="8dp"
-                android:src="@drawable/bookmark" />
+                android:src="@drawable/outline_grade_24" />
 
             <ImageButton
                 android:id="@+id/button_forward"
                 style="@style/BrowserControlButton"
-                android:src="@drawable/arrow_right" />
+                android:src="@drawable/baseline_arrow_forward_24" />
 
         </LinearLayout>
 
-        <ScrollView
-            android:id="@+id/dialog_scrollview"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="60dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/text_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/dialog_text_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:minEms="30"
+                android:textColor="#606060" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="60dp"
-                android:orientation="vertical">
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/dialog_text_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:ellipsize="end"
-                    android:lines="1"
-                    android:minEms="30"
-                    android:textColor="#606060" />
+                <ImageButton
+                    android:id="@+id/button_history"
+                    style="@style/BrowserControlButton"
+                    android:src="@drawable/baseline_history_24" />
 
-                <EditText
-                    android:id="@+id/text_url"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF" />
+                <ImageButton
+                    android:id="@+id/button_bookmarks"
+                    style="@style/BrowserControlButton"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/baseline_bookmark_24" />
 
-                <Button
-                    android:id="@+id/dialog_button_history"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/menu_button"
-                    android:text="@string/menu_history"
-                    android:textColor="#FFFFFF" />
+                <ImageButton
+                    android:id="@+id/button_download"
+                    style="@style/BrowserControlButton"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/baseline_download_24" />
 
-                <Button
-                    android:id="@+id/dialog_button_bookmark"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/menu_button"
-                    android:text="@string/menu_bookmark"
-                    android:textColor="#FFFFFF" />
-
-                <Button
-                    android:id="@+id/dialog_button_download"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/menu_button"
-                    android:text="@string/menu_download"
-                    android:textColor="#FFFFFF" />
+                <ImageButton
+                    android:id="@+id/button_zoom"
+                    style="@style/BrowserControlButton"
+                    android:src="@drawable/baseline_zoom_in_map_24" />
 
             </LinearLayout>
-        </ScrollView>
+
+        </LinearLayout>
     </LinearLayout>
-</FrameLayout>
+</LinearLayout>
